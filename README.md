@@ -8,20 +8,20 @@
 	• Option to make the seat smaller;  
 	• Several stays options for both main masts;  
 • The Cutter is slightly smaller than the Dhow, around 25 feet long (7.9 m);  
+• The Cutter can be rowed; 
   
 **Planned Features:**  
 • Vanilla style texturing for the Cutter;  
-• Rowing mechanics;  
-• Stepping and Striking the mast/s;  
 • Recovering/Hoisting mechanic;  
 • Two more dinghies (one per region).  
   
-**Configuration notes:** There is no mod settings for now;  
-⚠️⚠️⚠️**WARNING:** Loading a savegame with this mod **WILL** make it dependant on the mod!!! **WARNING**⚠️⚠️⚠️  
+**Configuration notes:** Go to *...\Sailwind\BepInEx\config* to access the mod configuration file. The oars keybinds can only be changed with the Bepinex Configuration Manager!;  
+⚠️**WARNING:** Loading a savegame with this mod **WILL** make it dependant on the mod!!! **WARNING**⚠️  
+**HOWEVER** it is possible to **CLEAN A SAVE** to safely uninstall the mod!  
   
 **Requirements: Requires BepInEx**  
 ✨✨✨**RECOMMENDED MOD: Shipyard Expansion is STRONGLY recommended to have more sail options!!!**✨✨✨  
 **Installation:** Download the Dinghies.zip and extract it into the *...\Sailwind\BepInEx\plugins* folder.  
 **Game version:** *0.29+*  
-**Mod Version:** *1.0.0*  
+**Mod Version:** *1.0.3*  
 **Warning:** Making a **backup of your save** is advisable before installing this mod!!!  
