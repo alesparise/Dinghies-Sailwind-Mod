@@ -8,7 +8,15 @@
 	• Option to make the seat smaller;  
 	• Several stays options for both main masts;  
 • The Cutter is slightly smaller than the Dhow, around 25 feet long (7.9 m);  
-• The Cutter can be rowed; 
+• The Cutter can be rowed:  
+	• Left oar forward/backward: press A / Q;  
+	• Right oar forward/backward: press E / Q;
+	• Click on the oar locks to secure the oar when not using them;  
+• Interactive nameplate, buy the nameplate in the shipyard, then click on it to write your boat's name;  
+	• The nameplate clickable area is near the bow, on the capping rim of the boat;  
+	• The game pauses when editing the name, it's not frozen!  
+	• Press ENTER to confirm the name;  
+	• Available characters: QWERTYUIOPASDFGHJKLZXCVBNM and space;  
   
 **Planned Features:**  
 • Vanilla style texturing for the Cutter;  
@@ -23,5 +31,5 @@
 ✨✨✨**RECOMMENDED MOD: Shipyard Expansion is STRONGLY recommended to have more sail options!!!**✨✨✨  
 **Installation:** Download the Dinghies.zip and extract it into the *...\Sailwind\BepInEx\plugins* folder.  
 **Game version:** *0.29+*  
-**Mod Version:** *1.0.3*  
+**Mod Version:** *1.0.4*  
 **Warning:** Making a **backup of your save** is advisable before installing this mod!!!  
