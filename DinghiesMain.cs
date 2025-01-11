@@ -9,32 +9,26 @@ using Object = UnityEngine.Object;
 
 namespace Dinghies
 {   /// <summary>
-    /// Patch notes:    (v1.0.3)
-    /// • Added SaveCleaner option;                                                             OK
-    /// • Added some missing sound effects (rudder creaking, impact sounds, bow splash);        OK
-    /// • Made cutter slightly more prone to sinking when heeling;                              OK
-    /// • Slightly lowered speed;                                                               OK
-    /// • Rudder: made the rudder more firm when held by the player;                            OK
-    /// • Rudder: made the rudder slightly less powerful;                                       OK
-    /// • Rudder: press forward or backward to center rudder;                                   OK
-    /// • Added oars and rowing system;                                                         OK
-    /// • Added eyes as a boat option;                                                          OK
+    /// TODO:   (v1.0.5)
+    /// • Stowing / Launching;
+    /// • Texture?
     /// 
-    /// BACKEND:
-    /// • dynamic boat index manager
-    /// • save cleaner option
-    /// • automatically updates the legacy saves to the new system;
-    /// • solved incompatibility with Le Requin;                                                OK
-    /// • removed bundle manifest file as it caused confusion;
+    /// Patch notes:    (v1.0.4)
+    /// • Changed all materials to sharedMaterials;
+    /// • Increased freeboard;
+    /// • Made the cutter less prone to sinking due to heeling;
+    /// • Fixed an issue causing random crashes;
+    /// • Fixed oars bug on enable/disable;
+    /// • Added customizable nameplates. Enable them in the shipyard, click on them to write and press enter to confirm
     /// </summary>
     [BepInPlugin(pluginGuid, pluginName, pluginVersion)]
-    //[BepInDependency("Romance.LeRequin", BepInDependency.DependencyFlags.SoftDependency)]   //this bypasses the issue with the index but its not a fix!
     public class DinghiesMain : BaseUnityPlugin
     {
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.3";    //HAD TO INCREASE VERSION BECAUSE OF COURSE I MESSED UP THUNDERSTORE...
+        public const string pluginVersion = "1.0.4";    //WIP version is going to be 1.0.4
+        public const string shortName = "pr0.dinghies";
 
         //config file info
         public static ConfigEntry<bool> nothingConfig;
@@ -46,7 +40,7 @@ namespace Dinghies
         public static ConfigEntry<bool> saveCleanerConfig;
 
         public void Awake()
-        {
+        {   
             //Create config file in BepInEx\config\
             nothingConfig = Config.Bind("A) General Settings", "nothing", true, "This setting does nothing. Default is true, set to false to disable.");
             invertedTillerConfig = Config.Bind("B) Rudder Settings", "Inverted Tiller", false, "Inverts the tiller control, e.g. press left to move right. Default is false, set to true to enable.");
@@ -101,6 +95,7 @@ namespace Dinghies
         public static string bundlePath;
         public static GameObject cutter;
         public static GameObject cutterEmbark;
+        public static GameObject[] letters = new GameObject[26];
         // PATCHES
         [HarmonyPrefix]
         public static void StartPatch(FloatingOriginManager __instance)
@@ -111,15 +106,17 @@ namespace Dinghies
 
             Transform shiftingWorld = __instance.transform;
             SetMooring(cutter, shiftingWorld);
+            
+            
             cutter = Object.Instantiate(cutter, shiftingWorld);
 
             //SET UP WALK COL
             cutterEmbark = cutter.transform.Find("WALK cutter").gameObject;
             cutterEmbark.transform.parent = GameObject.Find("walk cols").transform;
-            //RUDDER THINGS
-            //cutter.transform.Find("cutterModel").Find("rudder").Find("rudder_tiller_cutter").gameObject.AddComponent<TillerRudder>();
+
             //SET INITIAL POSITION
-            SetRotation(cutter, -89.8f);
+            Vector3 startPos = new Vector3(5691.12f, 0.3087376f, 38987.02f);
+            SetRotationAndPosition(cutter, -89.8f, startPos);
         }
         [HarmonyPrefix]
         public static void SailSetupPatch(Mast __instance)
@@ -161,7 +158,16 @@ namespace Dinghies
             string cutterPath = "Assets/Dinghies/BOAT Cutter (130).prefab";
             cutter = bundle.LoadAsset<GameObject>(cutterPath);
 
+            //load letters meshes
+            string lettersPath = "Assets/Dinghies/nameplate/letter";
+            for (int i = 0; i < 26; i++)
+            {   //load the letters
+                letters[i] = bundle.LoadAsset<GameObject>(lettersPath + i + ".prefab");
+            }
+
+            //ADD COMPONENTS
             Transform cutterT = cutter.transform;
+            Transform cutterModel = cutter.transform.Find("cutterModel");
 
             //Set the region
             cutter.GetComponent<PurchasableBoat>().region = GameObject.Find("Region Medi").GetComponent<Region>();
@@ -174,17 +180,21 @@ namespace Dinghies
             oarLocks.GetChild(1).GetChild(0).gameObject.AddComponent<Oar>();
             oarLocks.gameObject.AddComponent<OarLocks>();
 
+            //add nameplate component
+            Transform nameplateParent = cutterModel.Find("nameplates");
+            nameplateParent.Find("nameplate_left").gameObject.AddComponent<Nameplate>();
+            nameplateParent.Find("nameplate_right").gameObject.AddComponent<Nameplate>();
+
             //Fix materials
             MatLib.RegisterMaterials();
-            cutterT.Find("WaterFoam").GetComponent<MeshRenderer>().material = MatLib.foam;
-            cutterT.Find("WaterObjectInteractionSphereBack").GetComponent<MeshRenderer>().material = MatLib.objectInteraction;
-            cutterT.Find("WaterObjectInteractionSphereFront").GetComponent<MeshRenderer>().material = MatLib.objectInteraction;
-            Transform cutterModel = cutter.transform.Find("cutterModel");
-            cutterModel.Find("mask").GetComponent<MeshRenderer>().material = MatLib.convexHull;
-            cutterModel.Find("damage_water").GetComponent<MeshRenderer>().material = MatLib.water4;
-            cutterModel.Find("mask_splash").GetComponent<MeshRenderer>().material = MatLib.mask;
-            cutterT.Find("overflow particles").GetComponent<Renderer>().material = MatLib.overflow;
-            cutterT.Find("overflow particles (1)").GetComponent<Renderer>().material = MatLib.overflow;
+            cutterT.Find("WaterFoam").GetComponent<MeshRenderer>().sharedMaterial = MatLib.foam;
+            cutterT.Find("WaterObjectInteractionSphereBack").GetComponent<MeshRenderer>().sharedMaterial = MatLib.objectInteraction;
+            cutterT.Find("WaterObjectInteractionSphereFront").GetComponent<MeshRenderer>().sharedMaterial = MatLib.objectInteraction;
+            cutterT.Find("overflow particles").GetComponent<Renderer>().sharedMaterial = MatLib.overflow;
+            cutterT.Find("overflow particles (1)").GetComponent<Renderer>().sharedMaterial = MatLib.overflow;
+            cutterModel.Find("mask").GetComponent<MeshRenderer>().sharedMaterial = MatLib.convexHull;
+            cutterModel.Find("damage_water").GetComponent<MeshRenderer>().sharedMaterial = MatLib.water4;
+            cutterModel.Find("mask_splash").GetComponent<MeshRenderer>().sharedMaterial = MatLib.mask;
 
             //Easter egg
             cutterModel.Find("easter_egg").gameObject.SetActive(false);
@@ -193,9 +203,11 @@ namespace Dinghies
                 EasterEgg(cutter.transform.Find("cutterModel").Find("easter_egg").gameObject);
             }
         }
-        public static void SetRotation(GameObject boat, float yRot)
+        public static void SetRotationAndPosition(GameObject boat, float yRot, Vector3 position)
         {   //set the initial rotation of the boat
-            boat.transform.eulerAngles = new Vector3 (0f, yRot, 0f);
+            Transform t = boat.transform;
+            t.eulerAngles = new Vector3 (0f, yRot, 0f);
+            t.position = position;
         }
         public static void SetMooring(GameObject boat, Transform shiftingWorld)
         {   //attach the initial mooring lines to the correct cleats

@@ -48,6 +48,8 @@ namespace Dinghies
                 leftOar = transform.parent.parent.GetChild(0).GetComponentInChildren<Oar>();
                 forcePoint = transform.parent.parent.GetChild(3);
             }
+            gameObject.AddComponent<HingeJointFix>();
+            parentJoint.gameObject.AddComponent<HingeJointFix>();
             rb = transform.parent.parent.parent.parent.GetComponent<Rigidbody>();
             rudder = rb.transform.Find("cutterModel").Find("rudder").GetComponent<Rudder>();
             tiller = rudder.transform.GetChild(0).GetComponent<TillerRudder>();

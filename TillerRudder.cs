@@ -18,8 +18,8 @@ namespace Dinghies
         public float input;
         private float lastInput;
         private float rotationAngleLimit;
-        private float volumeMult = 0.05f;
-        private float mult = 0.025f;        //makes the rudder more or less responsive
+        private const float volumeMult = 0.05f;
+        private const float mult = 0.025f;        //makes the rudder more or less responsive
 
         private void Awake()
         {
@@ -146,14 +146,6 @@ namespace Dinghies
             {
                 input = 0f - rotationAngleLimit;
             }
-        }
-        private void RotateRudderAlt()
-        {   //alternative way to operate the rudder
-            //this seemed better, but in hindsight the og one might work better. Will release it like this for now.
-            //rudder.currentAngle = input; //DEBUG: It worked with this, add it back if it does not work anymore!
-            JointSpring spring = hingeJoint.spring;
-            spring.targetPosition = input;
-            hingeJoint.spring = spring;
         }
         private void ChangeDamper(bool held)
         {

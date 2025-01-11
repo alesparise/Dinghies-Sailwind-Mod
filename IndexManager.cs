@@ -95,9 +95,9 @@ namespace Dinghies
             {
                 //Debug.LogWarning("Dinghies: BoatIndexManager: No mod data saved...");
             }
-            if (saveContainer.modData.ContainsKey("pr0.dinghies.version"))
+            if (saveContainer.modData.ContainsKey(DinghiesMain.shortName + ".version"))
             {
-                loadedVersion = saveContainer.modData["pr0.dinghies.version"];
+                loadedVersion = saveContainer.modData[DinghiesMain.shortName + ".version"];
                 //check for version here if needed
             }
             else
@@ -219,7 +219,7 @@ namespace Dinghies
                 }
             }
             //Add mod version informations
-            GameState.modData["pr0.dinghies.version"] = DinghiesMain.pluginVersion;
+            GameState.modData[DinghiesMain.shortName + ".version"] = DinghiesMain.pluginVersion;
         }
         private static int GetHoleSize(GameObject boat)
         {   //calculates how many free spaces the mod needs in the SaveableObjects array

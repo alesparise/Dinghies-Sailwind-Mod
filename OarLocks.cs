@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Dinghies
@@ -24,7 +25,6 @@ namespace Dinghies
             leftOar.locks = this;
             rightOar.locks = this;
         }
-
         public override void OnActivate()
         {
             if (!oarUp)
@@ -40,9 +40,9 @@ namespace Dinghies
                 Juicebox.juice.PlaySoundAt("lock unlock", transform.position, 0f, 0.66f, 0.88f);
             }
         }
-
         public void SetPosition(bool up)
         {   //fix the oars in their up position if up is true, else let them loose
+            Debug.LogWarning("OarLocks: SetPosition called...");
             if (up)
             {
                 JointLimits limits = leftOar.joint.limits;

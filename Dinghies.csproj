@@ -71,7 +71,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HingeJointFix.cs" />
     <Compile Include="IndexManager.cs" />
+    <Compile Include="Nameplate.cs" />
     <Compile Include="OarLocks.cs" />
     <Compile Include="Oars.cs" />
     <Compile Include="SaveCleaner.cs" />
