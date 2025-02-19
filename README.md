@@ -31,5 +31,5 @@
 ✨✨✨**RECOMMENDED MOD: Shipyard Expansion is STRONGLY recommended to have more sail options!!!**✨✨✨  
 **Installation:** Download the Dinghies.zip and extract it into the *...\Sailwind\BepInEx\plugins* folder.  
 **Game version:** *0.29+*  
-**Mod Version:** *1.0.4*  
+**Mod Version:** *1.0.5*  
 **Warning:** Making a **backup of your save** is advisable before installing this mod!!!  

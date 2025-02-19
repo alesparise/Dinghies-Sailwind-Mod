@@ -16,7 +16,7 @@ namespace Dinghies
         private float textAnchorY;
         private float textAnchorZ;
         private float currentOffset;
-        private float[] spacing = { 
+        private readonly float[] spacing = { 
             0.045f,  //A
             0.065f,  //B
             0.06f,   //C

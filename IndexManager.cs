@@ -23,7 +23,7 @@ namespace Dinghies
         [HarmonyPrefix]
         private static void Manager(int backupIndex)
         {   //runs the necessary methods in order when LoadGame() is called
-            //Debug.LogWarning("Dinghies: Manager running");
+            Debug.LogWarning("Dinghies: Manager running");
             string path = ((backupIndex != 0) ? SaveSlots.GetBackupPath(SaveSlots.currentSlot, backupIndex) : SaveSlots.GetCurrentSavePath());
             SaveContainer saveContainer;
             BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -44,10 +44,14 @@ namespace Dinghies
                 {
                     saveContainer = UpdateSave(saveContainer);
                 }
-                using (FileStream fileStream = File.Open(path, FileMode.Create))
-                {   //pack the savecontainer back into the save
-                    binaryFormatter.Serialize(fileStream, saveContainer);
-                }
+                //using (FileStream fileStream = File.Open(path, FileMode.Create))
+                //{   //pack the savecontainer back into the save
+                //    binaryFormatter.Serialize(fileStream, saveContainer);
+                //}
+            }
+            using (FileStream fileStream = File.Open(path, FileMode.Create))
+            {   //pack the savecontainer back into the save
+                binaryFormatter.Serialize(fileStream, saveContainer);
             }
         }
         [HarmonyPostfix]

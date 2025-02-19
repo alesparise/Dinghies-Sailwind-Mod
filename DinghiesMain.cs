@@ -2,34 +2,44 @@
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
+using cakeslice;
 using HarmonyLib;
+using OVR;
 using UnityEngine;
 using Object = UnityEngine.Object;
 //poorly written by pr0skynesis (discord username)
 
 namespace Dinghies
 {   /// <summary>
-    /// TODO:   (v1.0.5)
-    /// • Stowing / Launching;
-    /// • Texture?
+    /// Patchnotes (v.1.0.5)
+    /// • Fixed the crash;
+    /// • Fixed anchor physics;  
+    /// • Added textures
     /// 
-    /// Patch notes:    (v1.0.4)
-    /// • Changed all materials to sharedMaterials;
-    /// • Increased freeboard;
-    /// • Made the cutter less prone to sinking due to heeling;
-    /// • Fixed an issue causing random crashes;
-    /// • Fixed oars bug on enable/disable;
-    /// • Added customizable nameplates. Enable them in the shipyard, click on them to write and press enter to confirm
+    /// TODO:   (v1.0.6)
+    /// • Refactor DinghiesMain.cs, separate patch classes and MatLib, check code for general improvements?
+    /// • Stowing / Launching;
+    /// • Add check for the oars so that they cannot be used when the boat is not purchased
+    /// • Add in-game manual explaining custom features
+    /// • Add a message system that opens a window on game launch to make important communications
+    /// • Add sleeping bag (a rollable bed)
+    /// • Texture
+    /// 
+    /// TODO: (later)
+    /// • Experiment with automatic updates?
+    /// • Mast unstepping, steppin?
+    /// • Other dinghies
+    /// 
     /// </summary>
     [BepInPlugin(pluginGuid, pluginName, pluginVersion)]
     public class DinghiesMain : BaseUnityPlugin
-    {
+    {   
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.4";    //WIP version is going to be 1.0.4
+        public const string pluginVersion = "1.0.5";    //1.0.5 is the version where I fixed the crash and made the texture
         public const string shortName = "pr0.dinghies";
-
+        
         //config file info
         public static ConfigEntry<bool> nothingConfig;
         public static ConfigEntry<bool> invertedTillerConfig;
@@ -67,6 +77,18 @@ namespace Dinghies
             MethodInfo patch6 = AccessTools.Method(typeof(IndexManager), "StartNewGamePatch");
             harmony.Patch(original6, new HarmonyMethod(patch6));
 
+            //FindObjectsOfType crash prevention
+            /*MethodInfo outlineOG1 = AccessTools.Method(typeof(Outline), "Awake");
+            MethodInfo outlineP1 = AccessTools.Method(typeof(TypeManager), "AddOutline");
+            harmony.Patch(outlineOG1, new HarmonyMethod(outlineP1));
+            MethodInfo outlineOG2 = AccessTools.Method(typeof(Outline), "OnDisable");
+            MethodInfo outlineP2 = AccessTools.Method(typeof(TypeManager), "RemoveOutline");
+            harmony.Patch(outlineOG2, new HarmonyMethod(outlineP2));
+            MethodInfo outlineOG3 = AccessTools.Method(typeof(OutlineEffect), "OnEnable");
+            MethodInfo outlineP3 = AccessTools.Method(typeof(TypeManager), "OnEnablePatch");
+            harmony.Patch(outlineOG3, new HarmonyMethod(outlineP3));
+            */
+
             //CONDITIONAL PATCHES
             if (!saveCleanerConfig.Value)
             {
@@ -91,32 +113,33 @@ namespace Dinghies
     public class DinghiesPatches
     {
         // variables 
-        public static AssetBundle bundle;
         public static string bundlePath;
+        public static AssetBundle bundle;
+        public static Material harlequinMat;
         public static GameObject cutter;
         public static GameObject cutterEmbark;
         public static GameObject[] letters = new GameObject[26];
+
         // PATCHES
         [HarmonyPrefix]
         public static void StartPatch(FloatingOriginManager __instance)
-        {
+        {   //this patches the FloatingOriginManager Start() method and does all the setup part
             SetupThings();
 
             IndexManager.AssignAvailableIndex(cutter);
 
             Transform shiftingWorld = __instance.transform;
-            SetMooring(cutter, shiftingWorld);
-            
-            
-            cutter = Object.Instantiate(cutter, shiftingWorld);
+            SetMooring(shiftingWorld);
 
+            GameObject instantiatedCutter = Object.Instantiate(cutter, shiftingWorld);
+            
             //SET UP WALK COL
-            cutterEmbark = cutter.transform.Find("WALK cutter").gameObject;
+            cutterEmbark = instantiatedCutter.transform.Find("WALK cutter").gameObject;
             cutterEmbark.transform.parent = GameObject.Find("walk cols").transform;
 
             //SET INITIAL POSITION
             Vector3 startPos = new Vector3(5691.12f, 0.3087376f, 38987.02f);
-            SetRotationAndPosition(cutter, -89.8f, startPos);
+            SetRotationAndPosition(instantiatedCutter, -89.8f, startPos);
         }
         [HarmonyPrefix]
         public static void SailSetupPatch(Mast __instance)
@@ -165,6 +188,10 @@ namespace Dinghies
                 letters[i] = bundle.LoadAsset<GameObject>(lettersPath + i + ".prefab");
             }
 
+            //load harlequin texture (I'll delete this eventually)
+            string harlequinPath = "Assets/Dinghies/Materials/cutterHarlequin.mat";
+            harlequinMat = bundle.LoadAsset<Material>(harlequinPath);
+
             //ADD COMPONENTS
             Transform cutterT = cutter.transform;
             Transform cutterModel = cutter.transform.Find("cutterModel");
@@ -172,9 +199,10 @@ namespace Dinghies
             //Set the region
             cutter.GetComponent<PurchasableBoat>().region = GameObject.Find("Region Medi").GetComponent<Region>();
 
-            //Add oar components
+            //Add tiller component
             cutterT.Find("cutterModel").Find("rudder").Find("rudder_tiller_cutter").gameObject.AddComponent<TillerRudder>();
             
+            //Add oar components
             Transform oarLocks = cutterT.Find("cutterModel").Find("oars_locks");
             oarLocks.GetChild(0).GetChild(0).gameObject.AddComponent<Oar>();
             oarLocks.GetChild(1).GetChild(0).gameObject.AddComponent<Oar>();
@@ -195,12 +223,14 @@ namespace Dinghies
             cutterModel.Find("mask").GetComponent<MeshRenderer>().sharedMaterial = MatLib.convexHull;
             cutterModel.Find("damage_water").GetComponent<MeshRenderer>().sharedMaterial = MatLib.water4;
             cutterModel.Find("mask_splash").GetComponent<MeshRenderer>().sharedMaterial = MatLib.mask;
+            //MatLib.FixFlagsMaterials(cutterModel.Find("structure"));
+
 
             //Easter egg
             cutterModel.Find("easter_egg").gameObject.SetActive(false);
             if (DinghiesMain.nothingConfig.Value)
             {
-                EasterEgg(cutter.transform.Find("cutterModel").Find("easter_egg").gameObject);
+                EasterEgg(cutterModel);
             }
         }
         public static void SetRotationAndPosition(GameObject boat, float yRot, Vector3 position)
@@ -209,21 +239,32 @@ namespace Dinghies
             t.eulerAngles = new Vector3 (0f, yRot, 0f);
             t.position = position;
         }
-        public static void SetMooring(GameObject boat, Transform shiftingWorld)
-        {   //attach the initial mooring lines to the correct cleats
+        public static void SetMooring(Transform shiftingWorld)
+        {   //attach the initial mooring lines to the correct cleats in Fort Aestrin (for now)
             Transform fort = shiftingWorld.Find("island 15 M (Fort)");
-            cutter.GetComponent<BoatMooringRopes>().mooringFront = fort.Find("dock_mooring M").transform;
-            cutter.GetComponent<BoatMooringRopes>().mooringBack = fort.Find("dock_mooring M (8)").transform;
+            BoatMooringRopes mr = cutter.GetComponent<BoatMooringRopes>();
+            mr.mooringFront = fort.Find("dock_mooring M").transform;
+            mr.mooringBack = fort.Find("dock_mooring M (8)").transform;
         }
-        public static void EasterEgg(GameObject easterEgg)
+        public static void EasterEgg(Transform cutterModel)
         {   //does absolutely nothing on a specific or date range
 
             DateTime today = DateTime.Now;
             int month = today.Month;
             int day = today.Day;
             if ((month == 12 && day >= 8) || (month == 1 && day <= 6))
-            {
+            {   //reindeer season
+                GameObject easterEgg = cutterModel.Find("easter_egg").gameObject;
                 easterEgg.SetActive(true);
+            }
+            if ((month == 2 && day >= 27) || (month == 3 && day <= 4))
+                {   //from 27 of february to 4th of march it's harlequin time
+                Debug.LogWarning("Dinghies: harlequin time!");
+                GameObject hull = cutterModel.Find("hull").gameObject;
+                Material[] mats = hull.GetComponent<MeshRenderer>().sharedMaterials;
+                mats[1] = harlequinMat;
+                hull.GetComponent<MeshRenderer>().sharedMaterials = mats;
+                Debug.LogWarning("Dinghies: harlequin time enabled");
             }
         }
     }
@@ -235,6 +276,7 @@ namespace Dinghies
         public static Material water4;
         public static Material mask;
         public static Material overflow;
+        //public static Material flags;
 
         public static void RegisterMaterials()
         {   //save the materials from the cog to the variables so that I can then easily assign them to the dinghy's gameobjects
@@ -246,6 +288,17 @@ namespace Dinghies
             water4 = mediSmall.Find("damage_water").GetComponent<MeshRenderer>().sharedMaterial;
             mask = mediSmall.Find("mask_splash").GetComponent<MeshRenderer>().sharedMaterial;
             overflow = cog.transform.Find("overflow particles").GetComponent<Renderer>().sharedMaterial;
+            //flags = new Material(Shader.Find("Ciconia Studio/Double Sided/Standard/Diffuse Bump"));
+            //Color col = new Color32(0x93, 0x00, 0x00, 0xFF);
+            //flags.color = col;
         }
+        /*public static void FixFlagsMaterials(Transform structure)
+        {
+            structure.Find("main_mast").Find("main_mast_flag").GetComponent<Renderer>().sharedMaterial = flags;
+            structure.Find("mizzen_mast").Find("mizzen_mast_flag").GetComponent<Renderer>().sharedMaterial = flags;
+            structure.Find("mid_mast").Find("mid_mast_flag").GetComponent<Renderer>().sharedMaterial = flags;
+            structure.Find("mid_mast").Find("shrouds_1").Find("shrouds_1_flag").GetComponent<Renderer>().sharedMaterial = flags;
+            structure.Find("mid_mast").Find("shrouds_2").Find("shrouds_2_flag").GetComponent<Renderer>().sharedMaterial = flags;
+        }*/
     }
 }
