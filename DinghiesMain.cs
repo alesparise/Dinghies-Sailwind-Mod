@@ -48,7 +48,7 @@ namespace Dinghies
         public static ConfigEntry<KeyCode> rightBConfig;
         public static ConfigEntry<bool> saveCleanerConfig;
         public static ConfigEntry<bool> notificationsConfig;
-        public static ConfigEntry<string> lastNoteHash;
+        public static ConfigEntry<string> lastNoteVer;
 
         public void Awake()
         {
@@ -65,7 +65,7 @@ namespace Dinghies
             //D) Other Settings
             saveCleanerConfig = Config.Bind("D) Other Settings", "Save Cleaner", false, "Removes the saves dependency on this mod. Only use if you want to remove the mod from an ongoing save! Change to true (with the game closed), open the game → load the save → save → close the game → remove the mod → done. A save backup is recommended.");
             notificationsConfig = Config.Bind("D) Other Settings", "Notifications", true, "Enable this mod notifications on startup. Set to false to disable.");
-            lastNoteHash = Config.Bind("D) Other Settings", "Last Note Hash", "", "Saves the hash of the last notification. Only change this if you want to see the last notification again.");
+            lastNoteVer = Config.Bind("D) Other Settings", "Last Note Version", "", "Saves the hash of the last notification. Only change this if you want to see the last notification again.");
 
             //PATCHING
             Harmony harmony = new Harmony(pluginGuid);

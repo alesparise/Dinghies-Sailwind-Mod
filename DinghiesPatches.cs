@@ -139,7 +139,6 @@ namespace Dinghies
                 notificationUI = bundle.LoadAsset<GameObject>(notificationPath);
                 notificationUI.AddComponent<NotificationManager>();
                 GameObject window = Object.Instantiate(notificationUI);
-                Debug.LogWarning("Dinghies: notification UI loaded");
             }
 
             //ADD COMPONENTS

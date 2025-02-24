@@ -3,5 +3,6 @@
   "latestVersion": "1.0.5",
   "header": "Dinghies Mod",
   "message": "Version 1.0.6 is out! Changelog\n• Changed default rig when Shipyard\nExpansion is installed\n• Slightly increased rudder power\n• Added notification system",
-  "charSize": 0.9
+  "charSize": 0.9,
+  "messageVersion": "dinghies.1"
 }

@@ -45,19 +45,19 @@ namespace Dinghies
             else
             {   
                 string jsonResponse = www.downloadHandler.text;
-                string hash = CalculateSHA256(jsonResponse);
-                if (hash != DinghiesMain.lastNoteHash.Value)
-                {   //if the hash is different, then show the notification and save the new hash as last hash
-                    MessageNote note = JsonUtility.FromJson<MessageNote>(jsonResponse);
+                MessageNote note = JsonUtility.FromJson<MessageNote>(jsonResponse);
+                if (note.messageVersion != DinghiesMain.lastNoteVer.Value)
+                {   //if the messageVersion is different, then show the notification and save the new messageVersion in the config file
+                    
                     header.text = note.header;
                     message.text = note.message;
                     message.characterSize = note.charSize;
-                    DinghiesMain.lastNoteHash.Value = hash;
+                    DinghiesMain.lastNoteVer.Value = note.messageVersion;
                     Debug.LogWarning("NM: notification shown");
                 }
                 else
                 {   //if the message is the same, hide the notification
-                    Debug.LogWarning("Notification has same hash!");
+                    Debug.LogWarning("NM: Notification has same hash!");
                     gameObject.SetActive(false);
                 }
             }
@@ -70,6 +70,7 @@ namespace Dinghies
             public string header;
             public string message;
             public float charSize;
+            public string messageVersion;
         }
 
         //HELPER METHODS
