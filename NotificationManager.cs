@@ -40,7 +40,7 @@ namespace Dinghies
             if (www.isNetworkError || www.isHttpError)
             {   //no connection or wrong url, I think
                 gameObject.SetActive(false);
-                Debug.LogError("Dinghies: cannot fetch notifications " + www.error);
+                Debug.LogError("Dinghies: cannot fetch notifications from GitHub: " + www.error);
             }
             else
             {   
@@ -52,9 +52,11 @@ namespace Dinghies
                     header.text = note.header;
                     message.text = note.message;
                     DinghiesMain.lastNoteHash.Value = hash;
+                    Debug.LogWarning("NM: notification shown");
                 }
                 else
                 {   //if the message is the same, hide the notification
+                    Debug.LogWarning("Notification has same hash!");
                     gameObject.SetActive(false);
                 }
             }
