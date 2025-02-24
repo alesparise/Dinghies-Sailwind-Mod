@@ -1,8 +1,6 @@
-﻿using System.Security.Cryptography;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Text;
 
 namespace Dinghies
 {   /// <summary>
