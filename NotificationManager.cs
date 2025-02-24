@@ -15,7 +15,6 @@ namespace Dinghies
         private TextMesh header;
         private TextMesh message;
 
-        //UNITY SPECIAL METHODS
         public void Awake()
         {
             Transform player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -31,7 +30,6 @@ namespace Dinghies
             StartCoroutine(CheckForUpdate());
         }
 
-        //MAIN METHODS
         private IEnumerator CheckForUpdate()
         {   //checks the url for a notification message
             UnityWebRequest www = UnityWebRequest.Get(url);
@@ -48,16 +46,13 @@ namespace Dinghies
                 MessageNote note = JsonUtility.FromJson<MessageNote>(jsonResponse);
                 if (note.messageVersion != DinghiesMain.lastNoteVer.Value)
                 {   //if the messageVersion is different, then show the notification and save the new messageVersion in the config file
-                    
                     header.text = note.header;
                     message.text = note.message;
                     message.characterSize = note.charSize;
                     DinghiesMain.lastNoteVer.Value = note.messageVersion;
-                    Debug.LogWarning("NM: notification shown");
                 }
                 else
                 {   //if the message is the same, hide the notification
-                    Debug.LogWarning("NM: Notification has same hash!");
                     gameObject.SetActive(false);
                 }
             }
@@ -71,26 +66,6 @@ namespace Dinghies
             public string message;
             public float charSize;
             public string messageVersion;
-        }
-
-        //HELPER METHODS
-        public static bool CheckForNotifications()
-        {
-            //cool code that checks if a notification is available and if it hasn't been shown yet.
-            return true;
-        }
-        public string CalculateSHA256(string input)
-        {   //calculate hash of the json message
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-                StringBuilder hashString = new StringBuilder();
-                foreach (byte b in bytes)
-                {
-                    hashString.Append(b.ToString("x2"));
-                }
-                return hashString.ToString();
-            }
         }
     }
 }
