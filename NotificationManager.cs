@@ -51,6 +51,7 @@ namespace Dinghies
                     MessageNote note = JsonUtility.FromJson<MessageNote>(jsonResponse);
                     header.text = note.header;
                     message.text = note.message;
+                    message.characterSize = note.charSize;
                     DinghiesMain.lastNoteHash.Value = hash;
                     Debug.LogWarning("NM: notification shown");
                 }
@@ -68,6 +69,7 @@ namespace Dinghies
             public string latestVersion;
             public string header;
             public string message;
+            public float charSize;
         }
 
         //HELPER METHODS
