@@ -12,7 +12,9 @@ namespace Dinghies
     /// • Changed default rig when Shipyard Expansion is installed
     /// • Slightly increased rudder power
     /// • Added notification system:
-    ///     - Opening the game will quickly
+    ///     - Opening the game will show a notification message if there is a new one;
+    ///     - This can be disabled in the config file;
+    ///     - Messages will let you know about new updates or bugfixes;
     /// 
     /// TODO:   (v1.0.6)
     /// • Refactor DinghiesMain.cs, separate patch classes and MatLib, check code for general improvements?
