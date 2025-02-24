@@ -40,7 +40,6 @@ namespace Dinghies
         }
         public void SetPosition(bool up)
         {   //fix the oars in their up position if up is true, else let them loose
-            Debug.LogWarning("OarLocks: SetPosition called...");
             if (up)
             {
                 JointLimits limits = leftOar.joint.limits;

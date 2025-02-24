@@ -98,22 +98,7 @@ namespace Dinghies
                 }
             }
         }
-        public static void NotificationPatch()
-        {   //initialises the notification UI
-            if (true)
-            {
-                
-                if (notificationUI != null)
-                {
-                    Debug.LogWarning("Dinghies: Notification patch running and UI loaded");
-                }
-                else
-                {
-                    Debug.LogWarning("Dinghies: Notification patch running and UI NOT loaded");
-                }
-            }
-        }
-
+        
         // HELPER METHODS
         public static void SetupThings()
         {   // loads the boat prefab
@@ -148,12 +133,12 @@ namespace Dinghies
             harlequinMat = bundle.LoadAsset<Material>(harlequinPath);
 
             //load notification UI
-            if (NotificationManager.CheckForNotifications())
+            if (DinghiesMain.notificationsConfig.Value)
             {
-                string notificationPath = "Assets/Dinghies/NotificationWindow.prefab";
+                string notificationPath = "Assets/Dinghies/notificationWindow.prefab";
                 notificationUI = bundle.LoadAsset<GameObject>(notificationPath);
                 notificationUI.AddComponent<NotificationManager>();
-                GameObject UI = Object.Instantiate(notificationUI);
+                GameObject window = Object.Instantiate(notificationUI);
                 Debug.LogWarning("Dinghies: notification UI loaded");
             }
 
@@ -188,9 +173,7 @@ namespace Dinghies
             cutterModel.Find("mask").GetComponent<MeshRenderer>().sharedMaterial = MatLib.convexHull;
             cutterModel.Find("damage_water").GetComponent<MeshRenderer>().sharedMaterial = MatLib.water4;
             cutterModel.Find("mask_splash").GetComponent<MeshRenderer>().sharedMaterial = MatLib.mask;
-            //MatLib.FixFlagsMaterials(cutterModel.Find("structure"));
-
-
+            
             //Easter egg
             cutterModel.Find("easter_egg").gameObject.SetActive(false);
             if (DinghiesMain.nothingConfig.Value)
