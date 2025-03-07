@@ -40,6 +40,14 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="Crest, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\Sailwind_Data\Managed\Crest.dll</HintPath>
+    </Reference>
+    <Reference Include="Crest.Examples, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\Sailwind_Data\Managed\Crest.Examples.dll</HintPath>
+    </Reference>
     <Reference Include="ShipyardExpansion">
       <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\BepInEx\plugins\ShipyardExpansion\ShipyardExpansion.dll</HintPath>
     </Reference>
@@ -86,6 +94,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Davits.cs" />
+    <Compile Include="Hook.cs" />
     <Compile Include="NotificationButton.cs" />
     <Compile Include="DinghiesPatches.cs" />
     <Compile Include="HingeJointFix.cs" />
@@ -96,6 +106,7 @@
     <Compile Include="OarLocks.cs" />
     <Compile Include="Oars.cs" />
     <Compile Include="SaveCleaner.cs" />
+    <Compile Include="StowingBrackets.cs" />
     <Compile Include="TillerRudder.cs" />
     <Compile Include="DinghiesMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

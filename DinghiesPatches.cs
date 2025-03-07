@@ -3,6 +3,7 @@ using BepInEx.Bootstrap;
 using HarmonyLib;
 using ShipyardExpansion;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -13,12 +14,19 @@ namespace Dinghies
     {
         // variables 
         public static string bundlePath;
+
         public static AssetBundle bundle;
+
         public static Material harlequinMat;
+
         public static GameObject cutter;
         public static GameObject cutterEmbark;
-        public static GameObject[] letters = new GameObject[26];
         public static GameObject notificationUI;
+        public static GameObject stowedCutter;
+        public static GameObject brigAssets;
+
+        public static GameObject[] letters = new GameObject[26];
+        
 
         // PATCHES
         [HarmonyPrefix]
@@ -31,15 +39,20 @@ namespace Dinghies
             Transform shiftingWorld = __instance.transform;
             SetMooring(shiftingWorld);
 
-            GameObject instantiatedCutter = Object.Instantiate(cutter, shiftingWorld);
+            GameObject cutterInstance = Object.Instantiate(cutter, shiftingWorld);
 
             //SET UP WALK COL
-            cutterEmbark = instantiatedCutter.transform.Find("WALK cutter").gameObject;
+            cutterEmbark = cutterInstance.transform.Find("WALK cutter").gameObject;
             cutterEmbark.transform.parent = GameObject.Find("walk cols").transform;
+
+            //Set up stowing
+            GameObject stowedCutterInstance = Object.Instantiate(stowedCutter, shiftingWorld);
+            GameObject brig = GameObject.Find("BOAT medi medium (50)");
+            AddBrigOptions(brig, brigAssets);
 
             //SET INITIAL POSITION
             Vector3 startPos = new Vector3(5691.12f, 0.3087376f, 38987.02f);
-            SetRotationAndPosition(instantiatedCutter, -89.8f, startPos);
+            SetRotationAndPosition(cutterInstance, -89.8f, startPos);
         }
         [HarmonyPrefix]
         public static void SailSetupPatch(Mast __instance)
@@ -141,6 +154,12 @@ namespace Dinghies
                 GameObject window = Object.Instantiate(notificationUI);
             }
 
+            //load stowing assets
+            string stowedCutterPath = "Assets/Dinghies/stowedCutter.prefab";
+            stowedCutter = bundle.LoadAsset<GameObject>(stowedCutterPath);
+            string brigPath = "Assets/Dinghies/brig_stowing.prefab";
+            brigAssets = bundle.LoadAsset<GameObject>(brigPath);
+
             //ADD COMPONENTS
             Transform cutterT = cutter.transform;
             Transform cutterModel = cutter.transform.Find("cutterModel");
@@ -149,13 +168,18 @@ namespace Dinghies
             cutter.GetComponent<PurchasableBoat>().region = GameObject.Find("Region Medi").GetComponent<Region>();
 
             //Add tiller component
-            cutterT.Find("cutterModel").Find("rudder").Find("rudder_tiller_cutter").gameObject.AddComponent<TillerRudder>();
+            cutterModel.Find("rudder").Find("rudder_tiller_cutter").gameObject.AddComponent<TillerRudder>();
 
             //Add oar components
-            Transform oarLocks = cutterT.Find("cutterModel").Find("oars_locks");
+            Transform oarLocks = cutterModel.Find("oars_locks");
             oarLocks.GetChild(0).GetChild(0).gameObject.AddComponent<Oar>();
             oarLocks.GetChild(1).GetChild(0).gameObject.AddComponent<Oar>();
             oarLocks.gameObject.AddComponent<OarLocks>();
+
+            //add stowing brackets component
+            Transform stowedCutterModel = stowedCutter.transform;
+            stowedCutterModel.Find("stowing_att_0").gameObject.AddComponent<StowingBrackets>();
+            stowedCutterModel.Find("stowing_att_1").gameObject.AddComponent<StowingBrackets>();
 
             //add nameplate component
             Transform nameplateParent = cutterModel.Find("nameplates");
@@ -213,6 +237,62 @@ namespace Dinghies
                 hull.GetComponent<MeshRenderer>().sharedMaterials = mats;
                 Debug.LogWarning("Dinghies: harlequin time enabled");
             }
+        }
+
+        public static void AddBrigOptions(GameObject boat, GameObject prefab)
+        {   //adds the parts to the brig
+            //get brig references
+            BoatCustomParts parts = boat.GetComponent<BoatCustomParts>();
+            Rigidbody rigidbody = boat.GetComponent<Rigidbody>();
+            BoatRefs refs = boat.GetComponent<BoatRefs>();
+            Transform walkCol = refs.walkCol;
+            Transform model = refs.boatModel;
+
+            //instantiate the prefab and then set up the assets
+            GameObject partInst = Object.Instantiate(prefab);
+            Transform root = partInst.transform;
+            Transform davitsTransform = root.Find("davits");
+            Transform noDavits = root.Find("no_davits");
+            Transform davitsWalk = root.Find("davitsWalk");
+            Transform noDavitsWalk = root.Find("no_davits_walk");
+
+            //Add the Davits component
+            davitsTransform.gameObject.AddComponent<Davits>();
+
+            //move and set parent as necessary
+            davitsTransform.SetParent(model, false);
+            noDavits.SetParent(model, false);
+            davitsWalk.SetParent(walkCol, false);
+            noDavitsWalk.SetParent(walkCol, false);
+
+            //fix winch not finding the boat by enabling the winch now, fix the connected rigidbody for the hooks
+            Transform block0 = davitsTransform.Find("block0");
+            Transform block1 = davitsTransform.Find("block1");
+            davitsTransform.Find("winch0").gameObject.SetActive(true);
+            davitsTransform.Find("winch1").gameObject.SetActive(true);
+            block0.Find("hook").GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
+            block1.Find("hook").GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
+
+            //add hooks components
+            block0.Find("hook").gameObject.AddComponent<Hook>();
+            block1.Find("hook").gameObject.AddComponent<Hook>();
+
+
+            //create and add the boatPart
+            BoatPart part = new BoatPart
+            {
+                category = 1,
+                partOptions = new List<BoatPartOption>
+                {
+                    davitsTransform.GetComponent<BoatPartOption>(),
+                    noDavits.GetComponent<BoatPartOption>()
+                },
+                activeOption = 0
+            };
+            
+            parts.availableParts.Add(part);
+
+            Debug.LogWarning("Dinghies: added davits to the brig");
         }
     }
 }

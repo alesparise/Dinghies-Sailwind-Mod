@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Dinghies
 {
@@ -33,16 +32,13 @@ namespace Dinghies
         }
         public override void OnActivate()
         {   //button is clicked
-            //closes the UI and writes somewhere that the message was seen
             if (type == ButtonType.github)
             {
                 Application.OpenURL(url);
-                Debug.LogWarning("NM: Opening URL");
             }
             if (type == ButtonType.ok)
             {
                 window.SetActive(false);
-                Debug.LogWarning("NM: Closed NotificationWindow");
             }
         }
     }

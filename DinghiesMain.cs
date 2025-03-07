@@ -16,13 +16,20 @@ namespace Dinghies
     ///     - This can be disabled in the config file;
     ///     - Messages will let you know about new updates or bugfixes;
     /// 
+    /// STOWING / LAUNCHING
+    /// Necessary things:
+    /// • Disable the dinghy gameobject when stowed? Or perhaps just disable it's physics?
+    /// • A way to connect the dinghy to the boat davits
+    /// • A way to raise and lower the dinghy pulling on a winch?
+    /// • Disable a bunch of the geometry when stowed for better performances
+    /// How to achieve this:
+    /// Test disabling the dinghy object or disabling / re-enabling the phyisic
+    /// 
     /// TODO:   (v1.0.6)
-    /// • Refactor DinghiesMain.cs, separate patch classes and MatLib, check code for general improvements?
     /// • Stowing / Launching;
+    /// • Add integrated storage under the bow cover
+    /// • Add integrated bed
     /// • Add check for the oars so that they cannot be used when the boat is not purchased
-    /// • Add in-game manual explaining custom features → moved to AESPA (Assets, Equipment, Shipyard and Portolan Add-on)
-    /// • Add a message system that opens a window on game launch to make important communications
-    /// • Add sleeping bag (a rollable bed) → moved to AESPA (Assets, Equipment, Shipyard and Portolan Add-on)
     /// 
     /// TODO: (later)
     /// • Experiment with automatic updates?
@@ -66,7 +73,7 @@ namespace Dinghies
             saveCleanerConfig = Config.Bind("D) Other Settings", "Save Cleaner", false, "Removes the saves dependency on this mod. Only use if you want to remove the mod from an ongoing save! Change to true (with the game closed), open the game → load the save → save → close the game → remove the mod → done. A save backup is recommended.");
             notificationsConfig = Config.Bind("D) Other Settings", "Notifications", true, "Enable this mod notifications on startup. Set to false to disable.");
             lastNoteVer = Config.Bind("D) Other Settings", "Last Note Version", "", "Saves the hash of the last notification. Only change this if you want to see the last notification again.");
-
+            
             //PATCHING
             Harmony harmony = new Harmony(pluginGuid);
             //patch to manage indexes
