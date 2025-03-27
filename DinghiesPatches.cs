@@ -1,37 +1,43 @@
-﻿using BepInEx;
-using BepInEx.Bootstrap;
-using HarmonyLib;
+﻿using BepInEx.Bootstrap;
 using ShipyardExpansion;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
+using System.Linq;
 
 namespace Dinghies
 {
     public class DinghiesPatches
     {
         // variables 
-        public static string bundlePath;
+        public static string modFolder;
+        public const string bridge = "DinghiesBridge.dll";      //the name of the .dll file containing the bridge components
+        public const string scripts = "DinghiesScripts.dll";    //the name of the .dll file containing the scripts components
 
         public static AssetBundle bundle;
-
-        public static Material harlequinMat;
 
         public static GameObject cutter;
         public static GameObject cutterEmbark;
         public static GameObject notificationUI;
         public static GameObject stowedCutter;
         public static GameObject brigAssets;
+        public static GameObject sanbuqAssets;
+        public static GameObject junkAssets;
+        public static GameObject jongAssets;
 
         public static GameObject[] letters = new GameObject[26];
-        
 
         // PATCHES
-        [HarmonyPrefix]
         public static void StartPatch(FloatingOriginManager __instance)
         {   //this patches the FloatingOriginManager Start() method and does all the setup part
+
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
+
             SetupThings();
 
             IndexManager.AssignAvailableIndex(cutter);
@@ -46,15 +52,28 @@ namespace Dinghies
             cutterEmbark.transform.parent = GameObject.Find("walk cols").transform;
 
             //Set up stowing
-            GameObject stowedCutterInstance = Object.Instantiate(stowedCutter, shiftingWorld);
+            //GameObject stowedCutterInstance = Object.Instantiate(stowedCutter, shiftingWorld);
+            GameObject stowedCutterInstance = cutterInstance.transform.Find("stowedCutter").gameObject;
+            stowedCutterInstance.transform.parent = shiftingWorld;
+            stowedCutterInstance.SetActive(false);
             GameObject brig = GameObject.Find("BOAT medi medium (50)");
-            AddBrigOptions(brig, brigAssets);
+            GameObject sanbuq = GameObject.Find("BOAT dhow medium (20)");
+            GameObject junk = GameObject.Find("BOAT junk medium (80)");
+            GameObject jong = GameObject.Find("BOAT junk large (70)");
+
+            AddDavitsOptions(brig, brigAssets, "brig");
+            AddDavitsOptions(sanbuq, sanbuqAssets, "sanbuq");
+            AddDavitsOptions(junk, junkAssets, "junk");
+            AddDavitsOptions(jong, jongAssets, "jong");
 
             //SET INITIAL POSITION
             Vector3 startPos = new Vector3(5691.12f, 0.3087376f, 38987.02f);
             SetRotationAndPosition(cutterInstance, -89.8f, startPos);
+
+            //sw.Stop();
+            //Debug.LogWarning("Dinghies: SetUp took: " + sw.ElapsedMilliseconds + " ms");
+            //LogStartupTime(sw.ElapsedMilliseconds);
         }
-        [HarmonyPrefix]
         public static void SailSetupPatch(Mast __instance)
         {   // set the inital sail to attach them
             if (__instance.transform.parent.parent.name == "cutterModel")
@@ -99,7 +118,7 @@ namespace Dinghies
                     Sail sail = __instance.GetComponentInChildren<Sail>();
                     sail.ChangeInstallHeight(-1f);    //starts at 3
                     sail.UpdateInstallPosition();
-                    
+
                 }
                 if (__instance.name == "main_mast")
                 {
@@ -107,31 +126,40 @@ namespace Dinghies
                     Sail sail = __instance.GetComponentInChildren<Sail>();
                     sail.ChangeInstallHeight(0.3f);    //starts at 4.2
                     sail.UpdateInstallPosition();
-                    
+
                 }
             }
         }
-        
+
         // HELPER METHODS
         public static void SetupThings()
-        {   // loads the boat prefab
-            bundlePath = Paths.PluginPath + "\\Dinghies\\dinghies";
+        {   // loads all the mods stuff (assemblies and assets)
+
+            //Get the folder of the mod's assembly
+            modFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            //Load the scripts assembly where the bridge components are stored
+            string bridgePath = Path.Combine(modFolder, bridge);
+            string scriptsPath = Path.Combine(modFolder, scripts);
+            if (File.Exists(bridgePath) && File.Exists(scriptsPath))
+            {
+                Assembly.LoadFrom(bridgePath);
+                Assembly.LoadFrom(scriptsPath);
+            }
+            else
+            {
+                Debug.LogError("Dinghies: Couldn't load " + bridge + " and/or " + scripts + "!");
+            }
+
+            //Load bundle
+            string bundlePath = Path.Combine(modFolder, "dinghies");
             bundle = AssetBundle.LoadFromFile(bundlePath);
             if (bundle == null)
-            {   // Maybe the user downloaded from thunderstore...
-                bundlePath = Paths.PluginPath + $"\\Pr0SkyNesis-Dinghies-{DinghiesMain.pluginVersion}" + "\\dinghies";
-                bundle = AssetBundle.LoadFromFile(bundlePath);
-                if (bundle == null)
-                {
-                    bundlePath = Paths.PluginPath + $"\\Pr0SkyNesis-Dinghies" + "\\dinghies";
-                    bundle = AssetBundle.LoadFromFile(bundlePath);
-                    if (bundle == null)
-                    {
-                        Debug.LogError("Dinghies: Bundle not loaded! Did you place it in the correct folder?");
-                    }
-                }
+            {
+                Debug.LogError("Dinghies: Could not load the bundle!");
+                return;
             }
-            string cutterPath = "Assets/Dinghies/BOAT Cutter (130).prefab";
+            string cutterPath = "Assets/Dinghies/DNG Cutter.prefab";
             cutter = bundle.LoadAsset<GameObject>(cutterPath);
 
             //load letters meshes
@@ -141,24 +169,23 @@ namespace Dinghies
                 letters[i] = bundle.LoadAsset<GameObject>(lettersPath + i + ".prefab");
             }
 
-            //load harlequin texture (I'll delete this eventually)
-            string harlequinPath = "Assets/Dinghies/Materials/cutterHarlequin.mat";
-            harlequinMat = bundle.LoadAsset<Material>(harlequinPath);
-
             //load notification UI
             if (DinghiesMain.notificationsConfig.Value)
             {
                 string notificationPath = "Assets/Dinghies/notificationWindow.prefab";
                 notificationUI = bundle.LoadAsset<GameObject>(notificationPath);
-                notificationUI.AddComponent<NotificationManager>();
                 GameObject window = Object.Instantiate(notificationUI);
             }
 
             //load stowing assets
-            string stowedCutterPath = "Assets/Dinghies/stowedCutter.prefab";
-            stowedCutter = bundle.LoadAsset<GameObject>(stowedCutterPath);
             string brigPath = "Assets/Dinghies/brig_stowing.prefab";
             brigAssets = bundle.LoadAsset<GameObject>(brigPath);
+            string sanbuqPath = "Assets/Dinghies/sanbuq_stowing.prefab";
+            sanbuqAssets = bundle.LoadAsset<GameObject>(sanbuqPath);
+            string junkPath = "Assets/Dinghies/junk_stowing.prefab";
+            junkAssets = bundle.LoadAsset<GameObject>(junkPath);
+            string jongPath = "Assets/Dinghies/jong_stowing.prefab";
+            jongAssets = bundle.LoadAsset<GameObject>(jongPath);
 
             //ADD COMPONENTS
             Transform cutterT = cutter.transform;
@@ -167,19 +194,15 @@ namespace Dinghies
             //Set the region
             cutter.GetComponent<PurchasableBoat>().region = GameObject.Find("Region Medi").GetComponent<Region>();
 
-            //Add tiller component
-            cutterModel.Find("rudder").Find("rudder_tiller_cutter").gameObject.AddComponent<TillerRudder>();
-
             //Add oar components
             Transform oarLocks = cutterModel.Find("oars_locks");
             oarLocks.GetChild(0).GetChild(0).gameObject.AddComponent<Oar>();
             oarLocks.GetChild(1).GetChild(0).gameObject.AddComponent<Oar>();
             oarLocks.gameObject.AddComponent<OarLocks>();
 
-            //add stowing brackets component
+            //Get the stowedCutter model
+            stowedCutter = cutterT.Find("stowedCutter").gameObject;
             Transform stowedCutterModel = stowedCutter.transform;
-            stowedCutterModel.Find("stowing_att_0").gameObject.AddComponent<StowingBrackets>();
-            stowedCutterModel.Find("stowing_att_1").gameObject.AddComponent<StowingBrackets>();
 
             //add nameplate component
             Transform nameplateParent = cutterModel.Find("nameplates");
@@ -196,7 +219,7 @@ namespace Dinghies
             cutterModel.Find("mask").GetComponent<MeshRenderer>().sharedMaterial = MatLib.convexHull;
             cutterModel.Find("damage_water").GetComponent<MeshRenderer>().sharedMaterial = MatLib.water4;
             cutterModel.Find("mask_splash").GetComponent<MeshRenderer>().sharedMaterial = MatLib.mask;
-            
+
             //Easter egg
             cutterModel.Find("easter_egg").gameObject.SetActive(false);
             if (DinghiesMain.nothingConfig.Value)
@@ -228,18 +251,8 @@ namespace Dinghies
                 GameObject easterEgg = cutterModel.Find("easter_egg").gameObject;
                 easterEgg.SetActive(true);
             }
-            if ((month == 2 && day >= 27) || (month == 3 && day <= 4))
-            {   //from 27 of february to 4th of march it's harlequin time
-                Debug.LogWarning("Dinghies: harlequin time!");
-                GameObject hull = cutterModel.Find("hull").gameObject;
-                Material[] mats = hull.GetComponent<MeshRenderer>().sharedMaterials;
-                mats[1] = harlequinMat;
-                hull.GetComponent<MeshRenderer>().sharedMaterials = mats;
-                Debug.LogWarning("Dinghies: harlequin time enabled");
-            }
         }
-
-        public static void AddBrigOptions(GameObject boat, GameObject prefab)
+        public static void AddDavitsOptions(GameObject boat, GameObject prefab, string boatName)
         {   //adds the parts to the brig
             //get brig references
             BoatCustomParts parts = boat.GetComponent<BoatCustomParts>();
@@ -251,13 +264,10 @@ namespace Dinghies
             //instantiate the prefab and then set up the assets
             GameObject partInst = Object.Instantiate(prefab);
             Transform root = partInst.transform;
-            Transform davitsTransform = root.Find("davits");
+            Transform davitsTransform = root.Find("davits_0_" + boatName);
             Transform noDavits = root.Find("no_davits");
-            Transform davitsWalk = root.Find("davitsWalk");
+            Transform davitsWalk = root.Find("davits_0_walk");
             Transform noDavitsWalk = root.Find("no_davits_walk");
-
-            //Add the Davits component
-            davitsTransform.gameObject.AddComponent<Davits>();
 
             //move and set parent as necessary
             davitsTransform.SetParent(model, false);
@@ -265,18 +275,9 @@ namespace Dinghies
             davitsWalk.SetParent(walkCol, false);
             noDavitsWalk.SetParent(walkCol, false);
 
-            //fix winch not finding the boat by enabling the winch now, fix the connected rigidbody for the hooks
-            Transform block0 = davitsTransform.Find("block0");
-            Transform block1 = davitsTransform.Find("block1");
-            davitsTransform.Find("winch0").gameObject.SetActive(true);
-            davitsTransform.Find("winch1").gameObject.SetActive(true);
-            block0.Find("hook").GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
-            block1.Find("hook").GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
-
-            //add hooks components
-            block0.Find("hook").gameObject.AddComponent<Hook>();
-            block1.Find("hook").gameObject.AddComponent<Hook>();
-
+            //fix the connected rigidbody for the hooks
+            davitsTransform.Find("block0/davits_0_hook_0_" + boatName).GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
+            davitsTransform.Find("block1/davits_0_hook_1_" + boatName).GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
 
             //create and add the boatPart
             BoatPart part = new BoatPart
@@ -289,10 +290,65 @@ namespace Dinghies
                 },
                 activeOption = 0
             };
-            
-            parts.availableParts.Add(part);
 
-            Debug.LogWarning("Dinghies: added davits to the brig");
+            parts.availableParts.Add(part);
+        }
+
+
+        //DEBUG METHOD TO LOG START UP TIMES
+        public static void LogStartupTime(float timeInMs)
+        {
+            string path = Path.Combine(modFolder, "StartupTimes.txt");
+            try
+            {
+                List<float> startupTimes = new List<float>();
+
+                // Read existing times if the file exists
+                if (File.Exists(path))
+                {
+                    string[] lines = File.ReadAllLines(path);
+
+                    // Skip the first line (it contains the average)
+                    foreach (string line in lines.Skip(1))
+                    {
+                        if (line.Contains("Startup #"))
+                        {
+                            string[] parts = line.Split(new[] { ":" }, StringSplitOptions.None);
+                            if (parts.Length > 1 && float.TryParse(parts[1].Replace("ms", "").Trim(), out float time))
+                            {
+                                startupTimes.Add(time);
+                            }
+                        }
+                    }
+                }
+
+                // Add the new startup time
+                startupTimes.Add(timeInMs);
+
+                // Calculate the new average
+                float averageTime = startupTimes.Average();
+
+                // Prepare new log contents
+                List<string> logContents = new List<string>
+            {
+                $"Average Startup Time: {averageTime:F2} ms" // First line with the average
+            };
+
+                // Add all previous log entries + new one
+                int i = 0;
+                foreach (float time in startupTimes)
+                {
+                    logContents.Add($"Startup #{i}: {time} ms");
+                    i++;
+                }
+
+                // Write back to the file
+                File.WriteAllLines(path, logContents);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to write log: {e.Message}");
+            }
         }
     }
 }

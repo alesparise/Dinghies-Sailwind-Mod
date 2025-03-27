@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -9,30 +8,31 @@ using UnityEngine;
 namespace Dinghies
 {   /// <summary>
     /// Patchnotes (v.1.0.6)
+    /// • Added stowing mechanic:
+    ///     - Davits are available in the shipyard for the Sanbuq, Junk, Brig and Jong;
+    ///     - Davits come with a tarp cover package. Grab it and clip it with the dinghy to cover it;
+    ///     - Grab one of the hooks from the davits and click on the metal bits sticking out from the covered dinghy;
+    ///     - When both hooks are connected, raise the dinghy with the winches that come with the davits;
     /// • Changed default rig when Shipyard Expansion is installed
     /// • Slightly increased rudder power
     /// • Added notification system:
     ///     - Opening the game will show a notification message if there is a new one;
     ///     - This can be disabled in the config file;
     ///     - Messages will let you know about new updates or bugfixes;
-    /// 
-    /// STOWING / LAUNCHING
-    /// Necessary things:
-    /// • Disable the dinghy gameobject when stowed? Or perhaps just disable it's physics?
-    /// • A way to connect the dinghy to the boat davits
-    /// • A way to raise and lower the dinghy pulling on a winch?
-    /// • Disable a bunch of the geometry when stowed for better performances
-    /// How to achieve this:
-    /// Test disabling the dinghy object or disabling / re-enabling the phyisic
+    /// • Made asset loader find assets relative to the .dll;
+    /// • Added bridge and scripts assemblies;
+    /// • Added a default name to the nameplate so that it's easier to find;
+    /// • Changed namplate saving and loading to allow multiple boats having names (future proofing, might erase your old name)
+    /// • Added check for the boat being bought before allowing the oars to be used
+    /// • Added a pillow option that acts like a bed, requires the long seat to be installed
+    /// • Added a centered tiller option, requires the mizzen mast to not be installed
+    /// • Merged the two flags option into one and added check for the correct shrouds to the flag options
     /// 
     /// TODO:   (v1.0.6)
-    /// • Stowing / Launching;
-    /// • Add integrated storage under the bow cover
-    /// • Add integrated bed
-    /// • Add check for the oars so that they cannot be used when the boat is not purchased
     /// 
     /// TODO: (later)
     /// • Experiment with automatic updates?
+    /// • Integrated storage undre bow cover
     /// • Mast unstepping, steppin?
     /// • Other dinghies
     /// 
@@ -43,7 +43,7 @@ namespace Dinghies
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.5";    //WIP version is 1.0.6
+        public const string pluginVersion = "1.0.6";    //1.0.6 was the stowing update
         public const string shortName = "pr0.dinghies";
         
         //config file info
@@ -94,7 +94,7 @@ namespace Dinghies
             //CONDITIONAL PATCHES
             if (!saveCleanerConfig.Value)
             {
-                //load the boat and spawn it
+                //load the dinghies and all assets
                 MethodInfo original = AccessTools.Method(typeof(FloatingOriginManager), "Start");
                 MethodInfo patch = AccessTools.Method(typeof(DinghiesPatches), "StartPatch");
                 harmony.Patch(original, new HarmonyMethod(patch));

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Security.Policy;
+using UnityEngine;
 
 namespace Dinghies
 {
@@ -7,32 +8,29 @@ namespace Dinghies
     /// </summary>
     public class NotificationButton : GoPointerButton
     {   
-        private enum ButtonType
+        public enum ButtonType
         { 
-            github,
-            ok
+            link,   //index 0
+            ok      //index 1
         }
 
         private ButtonType type;
 
         private GameObject window;
 
-        private const string url = "https://github.com/alesparise/Dinghies-Sailwind-Mod/releases/latest";
-        public void Awake()
+        private string url = "https://github.com/alesparise/Dinghies-Sailwind-Mod/releases/latest";
+
+        public void Init(int t, string u)
         {
             window = transform.parent.gameObject;
-            if (name == "okButton")
-            {
-                type = ButtonType.ok;
-            }
-            else if (name == "githubButton")
-            {
-                type = ButtonType.github;
-            }
+            type = (ButtonType)t;
+            url = u;
         }
+        
         public override void OnActivate()
         {   //button is clicked
-            if (type == ButtonType.github)
+
+            if (type == ButtonType.link)
             {
                 Application.OpenURL(url);
             }

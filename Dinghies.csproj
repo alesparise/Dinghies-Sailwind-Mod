@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Dinghies</RootNamespace>
     <AssemblyName>Dinghies</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,7 +49,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\Sailwind_Data\Managed\Crest.Examples.dll</HintPath>
     </Reference>
-    <Reference Include="ShipyardExpansion">
+    <Reference Include="ShipyardExpansion, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\BepInEx\plugins\ShipyardExpansion\ShipyardExpansion.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -94,15 +96,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Davits.cs" />
     <Compile Include="Hook.cs" />
+    <Compile Include="Tarp.cs" />
+    <Compile Include="TarpPack.cs" />
     <Compile Include="NotificationButton.cs" />
     <Compile Include="DinghiesPatches.cs" />
     <Compile Include="HingeJointFix.cs" />
     <Compile Include="IndexManager.cs" />
     <Compile Include="MatLib.cs" />
     <Compile Include="Nameplate.cs" />
-    <Compile Include="NotificationManager.cs" />
     <Compile Include="OarLocks.cs" />
     <Compile Include="Oars.cs" />
     <Compile Include="SaveCleaner.cs" />
@@ -115,6 +117,15 @@
     <None Include="CHANGELOG.md" />
     <None Include="notification.json" />
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="DinghiesScripts\DinghiesScripts.csproj">
+      <Project>{0d5504c4-f5a6-4702-9213-368175d39c48}</Project>
+      <Name>DinghiesScripts</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

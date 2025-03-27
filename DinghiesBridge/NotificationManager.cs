@@ -1,39 +1,34 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+using Dinghies;
 
-namespace Dinghies
+namespace DinghiesBridge
 {   /// <summary>
     /// Manages the notification system
     /// </summary>
     public class NotificationManager : MonoBehaviour
     {
-        private const string url = "https://raw.githubusercontent.com/alesparise/Dinghies-Sailwind-Mod/refs/heads/main/notification.json";
+        private const string URL = "https://raw.githubusercontent.com/alesparise/Dinghies-Sailwind-Mod/refs/heads/main/notification.json";
 
-        private TextMesh header;
-        private TextMesh message;
+        public TextMesh header;
+        public TextMesh message;
 
         private bool debugMessage = false;  //this can be set to true to test messages without changing the message version
                                             //this way you don't push the message to everyone!!!
-
         public void Awake()
         {
             Transform player = GameObject.FindGameObjectWithTag("Player").transform;
             transform.parent = player;
             transform.localPosition = new Vector3(0, 0.75f, 0.5f);
             transform.localRotation = Quaternion.identity;
-            transform.Find("okButton").gameObject.AddComponent<NotificationButton>();
-            transform.Find("githubButton").gameObject.AddComponent<NotificationButton>();
-
-            header = transform.Find("header").GetComponent<TextMesh>();
-            message = transform.Find("message").GetComponent<TextMesh>();
 
             StartCoroutine(CheckForUpdate());
         }
 
         private IEnumerator CheckForUpdate()
         {   //checks the url for a notification message
-            using (UnityWebRequest www = UnityWebRequest.Get(url))
+            using (UnityWebRequest www = UnityWebRequest.Get(URL))
             {
                 yield return www.SendWebRequest();
 
@@ -63,12 +58,14 @@ namespace Dinghies
         [System.Serializable]
         internal class MessageNote
         {   //This class is used to store the notification data
+            #pragma warning disable CS0649
             public string mod;
             public string latestVersion;
             public string header;
             public string message;
             public float charSize;
             public string messageVersion;
+            #pragma warning restore CS0649
         }
     }
 }

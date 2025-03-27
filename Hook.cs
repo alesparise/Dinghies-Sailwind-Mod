@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Dinghies
 {
@@ -7,46 +6,54 @@ namespace Dinghies
     {
         private RopeControllerAnchor rope;
 
-        private Transform parent;
+        private Transform block;
 
-        public Rigidbody boatBody;
-        public Rigidbody rb;
+        public Rigidbody rigidbody;
 
         public StowingBrackets bracket;
 
-        public void Awake()
-        {
-            rb = GetComponent<Rigidbody>();
-            parent = transform.parent;
-            if (parent.name == "block0")
-            {
-                rope = parent.parent.Find("controller0").GetComponent<RopeControllerAnchor>();
-            }
-            else
-            {
-                rope = parent.parent.Find("controller1").GetComponent<RopeControllerAnchor>();
-            }
-            RegisterBoat();
+        private Quaternion initialRot;
+
+        private Vector3 initialPos;
+
+        public override void Start()
+        {   //initialises the rigigidbody and sets its center of mass. Seems like it can only be done in Start()
+            base.Start();
+            rigidbody = GetComponent<Rigidbody>();
+            rigidbody.centerOfMass = new Vector3(0f, 0f, -1f);
+        }
+        public void Init(RopeControllerAnchor r, Transform b)
+        {   //initialises the Hook component, called in the bridge awake. Kinda like an Awake()
+            block = b;
+            rope = r;
+            initialRot = transform.localRotation;
+            initialPos = transform.localPosition;
         }
         public override void OnPickup()
-        {
-            if (bracket != null)
-            {
-                bracket.DisconnectHook();
-            }
+        {   //if the hook is connected, we disconnect it. When picked up the length is set to max
+            bracket?.DisconnectHook();
             rope.currentLength = rope.maxLength;
-            Debug.LogWarning("Hook: picked up");
         }
         public override void OnDrop()
-        {
+        {   //adjust the length based on distance from the block, resets rotation
             rope.currentLength = GetDistance() / rope.maxLength;
-
-            Debug.LogWarning("Hook: dropped");
+            transform.localRotation = initialRot;
+        }
+        public void OnDisable()
+        {   //reset the hook to it's initial position before disabling
+            ResetHook();
         }
         public override void ExtraLateUpdate()
-        {   //shows a red highlight if you are going too far
+        {   //shows a red highlight if you are going too far and drops the hook if you go further still
+
+            if (!(bool)held)
+            {
+                enableRedOutline = false;
+                return;
+            }
+
             float dist = GetDistance();
-            if ((bool)held && dist > rope.maxLength * 0.8f)
+            if (dist > rope.maxLength * 0.8f)
             {
                 enableRedOutline = true;
                 if (dist >= rope.maxLength)
@@ -60,24 +67,14 @@ namespace Dinghies
                 enableRedOutline = false;
             }
         }
-
         private float GetDistance()
-        {
-            return Vector3.Distance(transform.position, parent.position);
+        {   //calculates the distance between the hook and the block on the davit
+            return Vector3.Distance(transform.position, block.position);
         }
-        private void RegisterBoat()
-        {
-            Transform tf = parent;
-            while (tf != null)
-            {
-                Rigidbody rb = tf.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    boatBody = rb;
-                    return;
-                }
-                tf = tf.parent;
-            }
+        private void ResetHook()
+        {   //resets the Hook position and rope controller length
+            transform.localPosition = initialPos;
+            rope.currentLength = 0f;
         }
     }
 }

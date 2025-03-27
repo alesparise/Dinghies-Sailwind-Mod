@@ -6,6 +6,8 @@ namespace Dinghies
     /// </summary>
     public class OarLocks : GoPointerButton
     {
+        private SaveableObject saveable;
+
         public bool oarUp;
 
         private Oar leftOar;
@@ -17,14 +19,17 @@ namespace Dinghies
         private float max2 = 95f;
 
         private void Awake()
-        { 
-            leftOar = transform.GetChild(0).GetChild(0).GetComponent<Oar>();
-            rightOar = transform.GetChild(1).GetChild(0).GetComponent<Oar>();
+        {
+            Transform tr = transform;
+            saveable = tr.parent.parent.GetComponent<SaveableObject>();
+            leftOar = tr.GetChild(0).GetChild(0).GetComponent<Oar>();
+            rightOar = tr.GetChild(1).GetChild(0).GetComponent<Oar>();
             leftOar.locks = this;
             rightOar.locks = this;
         }
         public override void OnActivate()
         {
+            if (!saveable.extraSetting) return; //means it's not bought, oars shouldn't be usable
             if (!oarUp)
             {
                 oarUp = true;

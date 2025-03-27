@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -31,10 +32,18 @@ namespace Dinghies
             {   //running the cleaner in a 1.0.3+ save
                 foreach (string boat in IndexManager.loadedIndexMap.Keys)
                 {
-                    if (boat == "BOAT Cutter (130)")
+                    if (boat == "DNG Cutter")
                     {   //in the case of the cutter we need to clean two extra spots for the ropes
                         saveContainer.savedPrefabs.RemoveAll(x => x.itemParentObject == IndexManager.loadedIndexMap[boat] || x.itemParentObject == IndexManager.loadedIndexMap[boat] + 1 || x.itemParentObject == IndexManager.loadedIndexMap[boat] + 2);
                         saveContainer.savedObjects.RemoveAll(x => x.sceneIndex == IndexManager.loadedIndexMap[boat] || x.sceneIndex == IndexManager.loadedIndexMap[boat] + 1 || x.sceneIndex == IndexManager.loadedIndexMap[boat] + 2);
+                    }
+                }
+                foreach (SaveObjectData data in saveContainer.savedObjects)
+                {
+                    if (data.customization != null)
+                    {
+                        if (data.sceneIndex != 20 && data.sceneIndex != 50 && data.sceneIndex != 70 && data.sceneIndex != 80)
+                        data.customization = CleanDavits(data.customization, data.sceneIndex);
                     }
                 }
             }
@@ -43,6 +52,24 @@ namespace Dinghies
                 binaryFormatter.Serialize(fileStream, saveContainer);
             }
             Debug.LogWarning("Dinghies: save cleaned...");
+        }
+        private static SaveBoatCustomizationData CleanDavits(SaveBoatCustomizationData custom, int index)
+        {
+            BoatCustomParts parts = SaveLoadManager.instance.GetCurrentObjects()[index].GetComponent<BoatCustomParts>();
+
+            if (custom.partActiveOptions.Count > parts.availableParts.Count)
+            {
+                custom.partActiveOptions.RemoveRange(parts.availableParts.Count, custom.partActiveOptions.Count - parts.availableParts.Count);
+            }
+            for (int i = 0; i < custom.partActiveOptions.Count; i++)
+            {
+                if (custom.partActiveOptions[i] >= parts.availableParts[i].partOptions.Count)
+                {
+                    custom.partActiveOptions[i] = parts.availableParts[i].activeOption;
+                }
+            }
+
+            return custom;
         }
     }
 }

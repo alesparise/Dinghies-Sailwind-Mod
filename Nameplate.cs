@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
 
 namespace Dinghies
 {   /// <summary>
@@ -6,11 +8,11 @@ namespace Dinghies
     /// </summary>
     public class Nameplate : GoPointerButton
     {
-        private string plateName;
+        private string plateName = "CUTTER";    //THIS MUST BE ALL CAPS. I'M MAD!!! GRRRR!
         private const string key = DinghiesMain.shortName + ".plateName";
 
         private int letterCount;
-
+        
         private float unpausedTimescale;
         private float textAnchorX;
         private float textAnchorY;
@@ -61,6 +63,9 @@ namespace Dinghies
 
         private Vector3 direction = new Vector3(-1f, 0f, 0f);
 
+        private NameSaver nameSaver;
+        private static List<NameSaver> list;
+
         //UNITY METHODS
         private void Awake()
         {   //initialises the nameplate
@@ -81,7 +86,9 @@ namespace Dinghies
             textAnchorY = textAnchor.localPosition.y;
             textAnchorZ = textAnchor.localPosition.z;
 
-            plateName = "";
+            WriteLoadedName(plateName);
+
+            if (list == null) list = new List<NameSaver>();
         }
         public override void OnActivate()
         {   //gets called when clicking on the nameplate
@@ -243,7 +250,7 @@ namespace Dinghies
                 otherPlate.RemoveLetter();
             }
             else if (Input.GetKeyDown(KeyCode.Return))
-            {   //close the nameplate input using pressing enter
+            {   //close the nameplate input by pressing enter
                 Time.timeScale = unpausedTimescale;
                 SaveName();
                 otherPlate.SaveName();
@@ -430,22 +437,71 @@ namespace Dinghies
         }
         private void SaveName()
         {   //save the name to modData so we can load it upon awakening
-            GameState.modData[key] = boat.name + ":" + plateName + ";";
+
+            nameSaver = new NameSaver
+            {
+                boatName = boat.name,
+                plateName = plateName,
+            };
+            if (!list.Contains(nameSaver))
+            {
+                list.Add(nameSaver);
+            }
+
+            GameState.modData[key] = NameSaver.Serialize(list);
+            //GameState.modData[key] = boat.name + ":" + plateName + ";";
         }
         private void LoadName()
         {   //loads the correct name for the current nameplate
             if (GameState.modData.ContainsKey(key))
             {
-                string s = GameState.modData[key];
-                string[] pairs = s.Split(';');      //pairs are strings like 'cutterModel:TestName'
-                foreach (string pair in pairs)
+                List<NameSaver> nameSavers = NameSaver.Unserialize(GameState.modData[key]);
+                foreach (NameSaver ns in nameSavers)
                 {
-                    string[] split = pair.Split(':');
-                    if (split[0] == boat.name)
-                    {   //e.g. if split[0] == 'cutterModel' then split[1] is the plateName for this boat
-                        WriteLoadedName(split[1]);
+                    if (ns.boatName == boat.name)
+                    {
+                        WriteLoadedName(ns.plateName);
+                        break;
                     }
                 }
+            }
+        }
+        internal class NameSaver
+        {
+            public string boatName;
+            public string plateName;
+
+            public static string Serialize(List<NameSaver> nameSavers)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (NameSaver ns in nameSavers)
+                {
+                    sb.Append(ns.boatName); //cutterModel
+                    sb.Append(":");         //cutterModel:
+                    sb.Append(ns.plateName);//cutterModel:Jonny
+                    sb.Append(";");         //cutterModel:Jonny;
+                }
+
+                return sb.ToString(); //cutterModel:Jonny;outriggerModel:Tommy;
+            }
+            public static List<NameSaver> Unserialize(string s)
+            {
+                List<NameSaver> nameSavers = new List<NameSaver>();
+                string[] pairs = s.Split(';');
+                foreach (string pair in pairs)
+                {
+                    if (pair == "") continue;
+
+                    string[] split = pair.Split(':');
+                    NameSaver ns = new NameSaver
+                    {
+                        boatName = split[0],
+                        plateName = split[1]
+                    };
+                    nameSavers.Add(ns);
+                }
+
+                return nameSavers;
             }
         }
     }

@@ -5,7 +5,7 @@ namespace Dinghies
     /// Controls the tiller behaviour
     /// </summary>
     public class TillerRudder : GoPointerButton
-    {   
+    {
         private Rudder rudder;
 
         private HingeJoint hingeJoint;
@@ -21,15 +21,26 @@ namespace Dinghies
         private const float volumeMult = 0.05f;
         private const float mult = 0.025f;        //makes the rudder more or less responsive
 
-        private void Awake()
-        {
+        public void Init(Rudder r, HingeJoint j, AudioSource a)
+        {   //this is called by the TillerBridge component. Since this is called in TillerBridge.Awake() this can be treated
+            //as this component Awake (not literally, but sort of for this usecase)
+            rudder = r;
+            hingeJoint = j;
+            audio = a;
+            input = 0f;
+            lastInput = 0f;
+            rotationAngleLimit = hingeJoint.limits.max;
+        }
+
+        /*private void Awake()
+        {   OLDER AWAKE, KEEP AROUND JUST IN CASE
             rudder = transform.parent.GetComponent<Rudder>();
             hingeJoint = rudder.GetComponent<HingeJoint>();
             input = 0f;
             lastInput = 0f;
             rotationAngleLimit = hingeJoint.limits.max;
             audio = GetComponentInChildren<AudioSource>();
-        }
+        }*/
         public override void OnActivate(GoPointer activatingPointer)
         {   
             if (Settings.steeringWithMouse && activatingPointer.type == GoPointer.PointerType.crosshairMouse)
@@ -148,7 +159,7 @@ namespace Dinghies
             }
         }
         private void ChangeDamper(bool held)
-        {
+        {   //Changes the damper value to make the tiller firmer when being held
             if (held)
             {
                 JointSpring spring = hingeJoint.spring;

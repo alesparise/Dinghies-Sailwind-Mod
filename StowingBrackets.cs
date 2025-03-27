@@ -1,74 +1,168 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace Dinghies
-{
+{   ///<summary>
+    ///Controls the metal bracket used to connect the hooks with the stowed boat model
+    ///ISSUE:
+    ///1) The bracket outline stays on after bein clicked.
+    /// </summary>
     public class StowingBrackets : GoPointerButton
     {
-        bool connected;
+        private const string key = DinghiesMain.shortName + ".stowingBrackets";
 
-        private Transform shiftingWorld;
-        private Transform stowedBoat;
+        private bool connected;
+        private bool initialized;
 
-        public Rigidbody boatBody;
+        private static int toLoad;
+
+        private ConfigurableJoint joint;
 
         private Hook hook;
 
-        private HingeJoint joint;
+        private static List<BracketSaver> bracketSavers;
 
-        public void Awake()
+        private BracketSaver saver;
+
+        public void Init(ConfigurableJoint j)
         {
-            stowedBoat = transform.parent;
-            shiftingWorld = stowedBoat.parent;
-
-            boatBody = stowedBoat.GetComponent<Rigidbody>();
-
-            HingeJoint[] joints = stowedBoat.GetComponents<HingeJoint>();
-            
-            if (name.Contains("0"))
+            joint = j;
+            if (bracketSavers == null) bracketSavers = new List<BracketSaver>();
+            saver = new BracketSaver();
+        }
+        public void FixedUpdate()
+        {
+            if (!initialized)
             {
-                joint = joints[0];
+                LoadBracket();
+                initialized = true;
             }
-            else
+            if (pointedAtBy?.GetHeldItem() == null)
             {
-                joint = joints[1];
+                ForceUnlook();
             }
         }
-
         public override void OnActivate()
         {
-            Hook h = isClickedBy.pointer.GetHeldItem().GetComponent<Hook>();
-            if (isClickedBy.pointer.GetHeldItem() != null && h != null)
+            Hook h = isClickedBy?.pointer?.GetHeldItem()?.GetComponent<Hook>();
+            if (h != null)
             {
                 ConnectHook(h);
-                Debug.LogWarning("StowingBrackets: clicked with hook");
             }
             else if (connected)
             {   
                 connected = false;
                 DisconnectHook();
             }
+            ForceUnlook();
         }
         private void ConnectHook(Hook h)
         {
             hook = h;
-            joint.connectedBody = hook.rb;
+            joint.connectedBody = hook.rigidbody;
+            joint.xMotion = ConfigurableJointMotion.Locked;
+            joint.yMotion = ConfigurableJointMotion.Locked;
+            joint.zMotion = ConfigurableJointMotion.Locked;
             hook.bracket = this;
             hook.OnDrop();
-            hook.held.DropItem();
+            hook.held?.DropItem();
             
             connected = true;
 
-            Debug.LogWarning("StowingBracket: Hook connected");
+            if (toLoad == 0)
+            {
+                SaveBracket();
+            }
+            else
+            {
+                toLoad--;
+            }
         }
         public void DisconnectHook()
         {
+            joint.xMotion = ConfigurableJointMotion.Free;
+            joint.yMotion = ConfigurableJointMotion.Free;
+            joint.zMotion = ConfigurableJointMotion.Free;
             joint.connectedBody = null;
             hook.bracket = null;
             hook = null;
             connected = false;
-            
-            Debug.LogWarning("StowingBracket: Hook disconnected");
+
+            UnsaveBracket();
+        }
+        private void LoadBracket()
+        {
+            if (GameState.modData.ContainsKey(key))
+            {
+                List<BracketSaver> list = BracketSaver.Unserialize(GameState.modData[key]);
+                if (toLoad == 0)
+                {
+                    toLoad = list.Count;
+                }
+                foreach (BracketSaver bs in list)
+                {
+                    if (bs.bracket == name)
+                    {
+                        hook = GameObject.Find(bs.hook).GetComponent<Hook>();
+                        ConnectHook(hook);
+                        break;
+                    }
+                }
+            }
+        }
+        private void SaveBracket()
+        {
+            saver.bracket = name;
+            saver.hook = hook.name;
+            if (!bracketSavers.Contains(saver)) bracketSavers.Add(saver);
+
+            GameState.modData[key] = BracketSaver.Serialize(bracketSavers);
+        }
+        private void UnsaveBracket()
+        {
+            if (bracketSavers.Contains(saver)) bracketSavers.Remove(saver);
+
+            if (bracketSavers.Count == 0) GameState.modData[key] = "";
+            else GameState.modData[key] = BracketSaver.Serialize(bracketSavers);
+        }
+        internal class BracketSaver
+        {
+            public string bracket;
+            public string hook;
+
+            public static string Serialize(List<BracketSaver> bracketSavers)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (BracketSaver bs in bracketSavers)
+                {
+                    sb.Append(bs.bracket);   //davits_brig_0
+                    sb.Append(':');         //davits_brig_0:
+                    sb.Append(bs.hook);     //davits_brig_0:DNG Cutter (Clone)
+                    sb.Append(';');         //davits_brig_0:DNG Cutter (Clone);
+                }
+
+                return sb.ToString();
+            }
+            public static List<BracketSaver> Unserialize(string s)
+            {
+                List<BracketSaver> bracketSavers = new List<BracketSaver>();
+                string[] pairs = s.Split(';');
+                foreach (string pair in pairs)
+                {
+                    if (pair == "") continue;
+
+                    string[] split = pair.Split(':');
+                    BracketSaver bs = new BracketSaver
+                    {
+                        bracket = split[0],
+                        hook = split[1]
+                    };
+                    bracketSavers.Add(bs);
+                }
+
+                return bracketSavers;
+            }
         }
     }
 }
