@@ -6,6 +6,9 @@ using Dinghies;
 namespace DinghiesBridge
 {   /// <summary>
     /// Manages the notification system
+    /// NOTE: best way to test this is to write the message in the TextMesh
+    /// in Unity and then copy paste it to the json. Might be necessary to 
+    /// copy paste it to notepad and move everything to a single line first
     /// </summary>
     public class NotificationManager : MonoBehaviour
     {
