@@ -33,6 +33,7 @@ namespace DinghiesBridge
         {   //checks the url for a notification message
             using (UnityWebRequest www = UnityWebRequest.Get(URL))
             {
+                www.SetRequestHeader("Cache-Control", "no-cache");
                 yield return www.SendWebRequest();
 
                 if (www.isNetworkError || www.isHttpError)
