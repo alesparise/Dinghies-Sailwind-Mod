@@ -31,9 +31,9 @@ namespace DinghiesBridge
 
         private IEnumerator CheckForUpdate()
         {   //checks the url for a notification message
-            using (UnityWebRequest www = UnityWebRequest.Get(URL))
+            string timeURL = URL + "?timestamp=" + Time.time;
+            using (UnityWebRequest www = UnityWebRequest.Get(timeURL))
             {
-                www.SetRequestHeader("Cache-Control", "no-cache");
                 yield return www.SendWebRequest();
 
                 if (www.isNetworkError || www.isHttpError)
