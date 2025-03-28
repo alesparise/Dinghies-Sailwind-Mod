@@ -17,7 +17,7 @@ namespace DinghiesBridge
         public TextMesh header;
         public TextMesh message;
 
-        private bool debugMessage = true;   //this can be set to true to test messages without changing the message version
+        private bool debugMessage = false;   //this can be set to true to test messages without changing the message version
                                             //this way you don't push the message to everyone!!!
         public void Awake()
         {
@@ -31,8 +31,7 @@ namespace DinghiesBridge
 
         private IEnumerator CheckForUpdate()
         {   //checks the url for a notification message
-            string timeURL = URL + "?timestamp=" + Time.time;
-            using (UnityWebRequest www = UnityWebRequest.Get(timeURL))
+            using (UnityWebRequest www = UnityWebRequest.Get(URL))
             {
                 yield return www.SendWebRequest();
 
