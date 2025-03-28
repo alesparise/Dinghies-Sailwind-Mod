@@ -6,7 +6,7 @@
     - Messages will let you know about new updates or bugfixes;  
 • Added a pillow shipyard option that acts as a bed;  
 • Added a centered tiller option which can be used when the mizzen mast is removed;  
-• Changed the default rig when Shipyard Expasion is installed to use two lugs sails;  
+• Changed the default rig when Shipyard Expansion is installed to use two lugs sails;  
 • Added a default name to the nameplates, so that they are more visible when installed;
 
 **Fixes:**  
