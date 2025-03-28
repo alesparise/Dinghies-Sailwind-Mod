@@ -288,7 +288,7 @@ namespace Dinghies
                     davitsTransform.GetComponent<BoatPartOption>(),
                     noDavits.GetComponent<BoatPartOption>()
                 },
-                activeOption = 0
+                activeOption = 1    //davits disabled by default
             };
 
             parts.availableParts.Add(part);
