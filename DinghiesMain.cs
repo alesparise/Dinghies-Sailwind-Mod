@@ -28,8 +28,6 @@ namespace Dinghies
     /// • Added a centered tiller option, requires the mizzen mast to not be installed
     /// • Merged the two flags option into one and added check for the correct shrouds to the flag options
     /// 
-    /// TODO:   (v1.0.6)
-    /// 
     /// TODO: (later)
     /// • Experiment with automatic updates?
     /// • Integrated storage undre bow cover
