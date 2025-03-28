@@ -50,6 +50,7 @@ namespace DinghiesBridge
                         message.text = note.message;
                         message.characterSize = note.charSize;
                         DinghiesMain.lastNoteVer.Value = note.messageVersion;
+                        if (debugMessage) Debug.LogWarning("Message:\n" + note.message);
                     }
                     else
                     {   //if the message is the same, hide the notification

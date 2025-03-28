@@ -2,7 +2,7 @@
   "mod": "pr0skynesis.dinghies",
   "latestVersion": "1.0.6",
   "header": "Dinghies Mod",
-  "message": "Version 1.0.6 is out! Changelog:\n• Added stowing mechanic, see full changelog on GitHub\n or Discord for a guide!\n• Changed default rig if Shipyard Expansion is installed\n• Slightly increased rudder power\n• Added notification system (this thing!)\n• Added a pillow option to act as a bed\n• Added default name to make nameplate more visible\n• Added centered tiller option\n• Some techincal changes\nSee Discord or GitHub for the\nfull changelog",
+  "message": "Version 1.0.6 is out! Changelog:\n• Added stowing mechanic, see full changelog on GitHub\n or Discord for a guide!\n• Changed default rig if Shipyard Expansion is installed\n• Slightly increased rudder power\n• Added notification system (this thing!)\n• Added a pillow option to act as a bed\n• Added default name to make nameplate more visible\n• Added centered tiller option\n• Some techincal changes\n→See Discord or GitHub for the\nfull changelog",
   "charSize": 0.6,
   "messageVersion": "dinghies.1"
 }
