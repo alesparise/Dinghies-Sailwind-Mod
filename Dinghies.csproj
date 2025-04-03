@@ -35,6 +35,9 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="AnchorImprovements">
+      <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\BepInEx\plugins\AnchorImprovements.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\Games\Steam\steamapps\common\Sailwind\Sailwind_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -97,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hook.cs" />
+    <Compile Include="RopeControllerDavits.cs" />
     <Compile Include="Tarp.cs" />
     <Compile Include="TarpPack.cs" />
     <Compile Include="NotificationButton.cs" />

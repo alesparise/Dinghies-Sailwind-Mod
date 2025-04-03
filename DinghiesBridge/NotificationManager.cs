@@ -17,8 +17,8 @@ namespace DinghiesBridge
         public TextMesh header;
         public TextMesh message;
 
-        private bool debugMessage = false;   //this can be set to true to test messages without changing the message version
-                                            //this way you don't push the message to everyone!!!
+        private bool debugMessage = true;   //this can be set to true to test messages without changing the message version
+                                             //this way you don't push the message to everyone!!!
         public void Awake()
         {
             Transform player = GameObject.FindGameObjectWithTag("Player").transform;

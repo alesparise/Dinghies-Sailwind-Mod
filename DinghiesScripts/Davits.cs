@@ -52,6 +52,12 @@ namespace DinghiesScripts
                 winch0.SetActive(true);
                 winch1.SetActive(true);
 
+                if (winch0.transform.localScale.x > 0.8f)
+                {
+                    winch0.transform.localScale = new Vector3(0.7f, 0.7f, 0.6f);
+                    winch1.transform.localScale = new Vector3(0.7f, 0.7f, 0.6f);
+                }
+
                 LoadStowed();
                 initialized = true;
             }

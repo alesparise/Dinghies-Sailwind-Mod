@@ -8,6 +8,8 @@ using UnityEngine;
 
 using Object = UnityEngine.Object;
 using System.Linq;
+using HarmonyLib;
+using DinghiesScripts;
 
 namespace Dinghies
 {
@@ -17,7 +19,7 @@ namespace Dinghies
         public static string modFolder;
         public const string bridge = "DinghiesBridge.dll";      //the name of the .dll file containing the bridge components
         public const string scripts = "DinghiesScripts.dll";    //the name of the .dll file containing the scripts components
-
+        
         public static AssetBundle bundle;
 
         public static GameObject cutter;
@@ -130,7 +132,14 @@ namespace Dinghies
                 }
             }
         }
-
+        public static bool ImpactPatch(Collision collision)
+        {   //prevents waking up the player when the stowed dinghy collides with the boat
+            if (collision.collider.name == "stowedCutter" || collision.collider.transform.parent.name == "stowedCutter")
+            {
+                return false;
+            }
+            return true;
+        }
         // HELPER METHODS
         public static void SetupThings()
         {   // loads all the mods stuff (assemblies and assets)
@@ -276,8 +285,19 @@ namespace Dinghies
             noDavitsWalk.SetParent(walkCol, false);
 
             //fix the connected rigidbody for the hooks
-            davitsTransform.Find("block0/davits_0_hook_0_" + boatName).GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
-            davitsTransform.Find("block1/davits_0_hook_1_" + boatName).GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
+            Transform hook0 = davitsTransform.Find("block0/davits_0_hook_0_" + boatName);
+            Transform hook1 = davitsTransform.Find("block1/davits_0_hook_1_" + boatName);
+            hook0.GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
+            hook1.GetComponent<ConfigurableJoint>().connectedBody = rigidbody;
+
+            //add ropecontroller to ropes
+            RopeControllerDavits rope0 = davitsTransform.Find("controller0").gameObject.GetComponent<RopeControllerDavits>();
+            RopeControllerDavits rope1 = davitsTransform.Find("controller1").gameObject.GetComponent<RopeControllerDavits>();
+            hook0.GetComponent<Hook>().rope = rope0;
+            hook1.GetComponent<Hook>().rope = rope1;
+
+            davitsTransform.Find("winch0").GetComponent<GPButtonRopeWinch>().rope = rope0;
+            davitsTransform.Find("winch1").GetComponent<GPButtonRopeWinch>().rope = rope1;
 
             //create and add the boatPart
             BoatPart part = new BoatPart

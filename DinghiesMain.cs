@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
@@ -41,7 +43,7 @@ namespace Dinghies
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.6";    //1.0.6 was the stowing update
+        public const string pluginVersion = "1.0.7";    //1.0.7 was the AnchorImprovements and collision fix
         public const string shortName = "pr0.dinghies";
         
         //config file info
@@ -88,6 +90,11 @@ namespace Dinghies
             MethodInfo original6 = AccessTools.Method(typeof(StartMenu), "StartNewGame");
             MethodInfo patch6 = AccessTools.Method(typeof(IndexManager), "StartNewGamePatch");
             harmony.Patch(original6, new HarmonyMethod(patch6));
+
+            //patch to avoid waking up the player for collision with stowed dinghy
+            MethodInfo original7 = AccessTools.Method(typeof(BoatImpactSounds), "Impact");
+            MethodInfo patch7 = AccessTools.Method(typeof(DinghiesPatches), "ImpactPatch");
+            harmony.Patch(original7, new HarmonyMethod(patch7));
 
             //CONDITIONAL PATCHES
             if (!saveCleanerConfig.Value)

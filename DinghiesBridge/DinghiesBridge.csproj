@@ -76,6 +76,7 @@
     <Compile Include="HookBridge.cs" />
     <Compile Include="NotificationButtonBridge.cs" />
     <Compile Include="NotificationManager.cs" />
+    <Compile Include="RopeControllerDavitsBridge.cs" />
     <Compile Include="StowingBracketsBridge.cs" />
     <Compile Include="TarpBridge.cs" />
     <Compile Include="TarpPackBridge.cs" />

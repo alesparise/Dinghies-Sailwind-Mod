@@ -4,7 +4,7 @@ namespace Dinghies
 {
     public class Hook : PickupableItem
     {
-        private RopeControllerAnchor rope;
+        public RopeControllerDavits rope;
 
         private Transform block;
 
@@ -22,10 +22,9 @@ namespace Dinghies
             rigidbody = GetComponent<Rigidbody>();
             rigidbody.centerOfMass = new Vector3(0f, 0f, -1f);
         }
-        public void Init(RopeControllerAnchor r, Transform b)
+        public void Init(Transform b)
         {   //initialises the Hook component, called in the bridge awake. Kinda like an Awake()
             block = b;
-            rope = r;
             initialRot = transform.localRotation;
             initialPos = transform.localPosition;
         }
