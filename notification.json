@@ -4,5 +4,5 @@
   "header": "Dinghies Mod",
   "message": "Version 1.0.7 is out! Changelog:\n- Fixed collisions with the stowed\ndinghies waking up the player;\n- Davits should now be disabled\nby default;\n- Fixed compatibility issue with\nAnchor Improvements;\n",
   "charSize": 0.9,
-  "messageVersion": "dinghies.1"
+  "messageVersion": "dinghies.2"
 }
