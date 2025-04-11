@@ -469,7 +469,8 @@ namespace Dinghies
         }
         private void CleanName()
         {   //removes the name entirely
-            for (int i = 0; i < plateName.Length; i++)
+            int l = plateName.Length;
+            for (int i = 0; i < l; i++)
             {
                 RemoveLetter();
             }
