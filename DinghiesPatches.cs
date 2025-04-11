@@ -19,7 +19,9 @@ namespace Dinghies
         public static string modFolder;
         public const string bridge = "DinghiesBridge.dll";      //the name of the .dll file containing the bridge components
         public const string scripts = "DinghiesScripts.dll";    //the name of the .dll file containing the scripts components
-        
+
+        private const float cartDudeRangeMult = 1.5f;
+
         public static AssetBundle bundle;
 
         public static GameObject cutter;
@@ -140,6 +142,20 @@ namespace Dinghies
             }
             return true;
         }
+        public static bool CartDudePatch(CargoStorageUI __instance, Transform ___currentDude)
+        {   //makes the transport dude disable at an increased range
+            if ((bool)___currentDude && Vector3.Distance(Refs.observerMirror.transform.position, ___currentDude.position) > (180f * cartDudeRangeMult))
+            {
+                Debug.Log("Transport dude out of range, disabling cargo carry mode.");
+                __instance.UnregisterCarrier();
+                if (PlayerNeedsUI.instance.IsActive())
+                {
+                    __instance.ToggleUI(false);
+                }
+            }
+            return false;
+        }
+
         // HELPER METHODS
         public static void SetupThings()
         {   // loads all the mods stuff (assemblies and assets)

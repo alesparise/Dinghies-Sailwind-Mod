@@ -1,8 +1,8 @@
 {
   "mod": "pr0skynesis.dinghies",
-  "latestVersion": "1.0.7",
+  "latestVersion": "1.0.8",
   "header": "Dinghies Mod",
-  "message": "Version 1.0.7 is out! Changelog:\n- Fixed collisions with the stowed\ndinghies waking up the player;\n- Davits should now be disabled\nby default;\n- Fixed compatibility issue with\nAnchor Improvements;\n",
-  "charSize": 0.9,
+  "message": "Version 1.0.8 is out! Changelog:\n- Fixed saved names not loading\ncorrectly\n- Increased cart dude range by 50%",
+  "charSize": 0.8,
   "messageVersion": "dinghies.2"
 }

@@ -43,7 +43,7 @@ namespace Dinghies
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.7";    //1.0.7 was the AnchorImprovements and collision fix
+        public const string pluginVersion = "1.0.8";    //1.0.8 was the Namplate save fix and cart dude range increase
         public const string shortName = "pr0.dinghies";
         
         //config file info
@@ -57,8 +57,6 @@ namespace Dinghies
         public static ConfigEntry<bool> notificationsConfig;
         public static ConfigEntry<string> lastNoteVer;
 
-        //debug
-        bool crash;
         public void Awake()
         {
             //Create config file in BepInEx\config\
@@ -98,6 +96,11 @@ namespace Dinghies
             MethodInfo patch7 = AccessTools.Method(typeof(DinghiesPatches), "ImpactPatch");
             harmony.Patch(original7, new HarmonyMethod(patch7));
 
+            //patch to increase the range of the cart dude
+            MethodInfo original8 = AccessTools.Method(typeof(CargoStorageUI), "Update");
+            MethodInfo patch8 = AccessTools.Method(typeof(DinghiesPatches), "CartDudePatch");
+            harmony.Patch(original8, new HarmonyMethod(patch8));
+
             //CONDITIONAL PATCHES
             if (!saveCleanerConfig.Value)
             {
@@ -124,7 +127,7 @@ namespace Dinghies
             }
         }
 
-        //DEBUG UPDATE
+        //DEBUG
         /*public void Update()
         {
             if (Input.GetKeyDown(KeyCode.L))
