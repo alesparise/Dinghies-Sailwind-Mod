@@ -32,8 +32,8 @@ namespace Dinghies
     /// 
     /// TODO: (later)
     /// • Experiment with automatic updates?
-    /// • Integrated storage undre bow cover
-    /// • Mast unstepping, steppin?
+    /// • Integrated storage under bow cover
+    /// • Mast unstepping, stepping?
     /// • Other dinghies
     /// 
     /// </summary>
@@ -57,6 +57,8 @@ namespace Dinghies
         public static ConfigEntry<bool> notificationsConfig;
         public static ConfigEntry<string> lastNoteVer;
 
+        //debug
+        bool crash;
         public void Awake()
         {
             //Create config file in BepInEx\config\
@@ -121,5 +123,29 @@ namespace Dinghies
                 harmony.Patch(original3, new HarmonyMethod(patch3));
             }
         }
+
+        //DEBUG UPDATE
+        /*public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                crash = !crash;
+                Debug.LogWarning("Dinghies: crash = " + crash);
+            }
+            if (crash)
+            {
+                GC.Collect();
+                Resources.UnloadUnusedAssets();
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad7))
+            {
+                PlayerNeeds.sleep = 80f;
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad8))
+            {   //raise wind
+                Wind.currentWind *= 1.1f;
+                Debug.LogWarning("CurrentWind: " + Wind.currentWind.magnitude);
+            }
+        }*/
     }
 }

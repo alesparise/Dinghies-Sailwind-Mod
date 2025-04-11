@@ -134,7 +134,7 @@ namespace Dinghies
         }
         public static bool ImpactPatch(Collision collision)
         {   //prevents waking up the player when the stowed dinghy collides with the boat
-            if (collision.collider.name == "stowedCutter" || collision.collider.transform.parent.name == "stowedCutter")
+            if (collision?.collider?.name == "stowedCutter" || collision?.collider?.transform.parent?.name == "stowedCutter")
             {
                 return false;
             }
@@ -235,6 +235,9 @@ namespace Dinghies
             {
                 EasterEgg(cutterModel);
             }
+
+            //DEBUG:
+            //ShowWalkCols(); //this shows the WalkCols layer
         }
         public static void SetRotationAndPosition(GameObject boat, float yRot, Vector3 position)
         {   //set the initial rotation of the boat
@@ -314,8 +317,7 @@ namespace Dinghies
             parts.availableParts.Add(part);
         }
 
-
-        //DEBUG METHOD TO LOG START UP TIMES
+        //DEBUG METHODS (This are not used in the released versions)
         public static void LogStartupTime(float timeInMs)
         {
             string path = Path.Combine(modFolder, "StartupTimes.txt");
@@ -369,6 +371,11 @@ namespace Dinghies
             {
                 Debug.LogError($"Failed to write log: {e.Message}");
             }
+        }
+        public static void ShowWalkCols()
+        {   //debug method to show the walk cols
+            
+            Camera.main.cullingMask |= 1 << LayerMask.NameToLayer("WalkCols");
         }
     }
 }

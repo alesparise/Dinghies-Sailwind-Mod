@@ -460,10 +460,18 @@ namespace Dinghies
                 {
                     if (ns.boatName == boat.name)
                     {
+                        CleanName();
                         WriteLoadedName(ns.plateName);
                         break;
                     }
                 }
+            }
+        }
+        private void CleanName()
+        {   //removes the name entirely
+            for (int i = 0; i < plateName.Length; i++)
+            {
+                RemoveLetter();
             }
         }
         internal class NameSaver
