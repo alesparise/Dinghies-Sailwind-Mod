@@ -4,5 +4,5 @@
   "header": "Dinghies Mod",
   "message": "Version 1.0.9 is out! Changelog:\n- Increased Cutter stability\n- Fixed damage water missing audio\n- Fixed damage water clipping out\nof the boat\n- Reduced davits prices",
   "charSize": 0.8,
-  "messageVersion": "dinghies.3"
+  "messageVersion": "dinghies.4"
 }
