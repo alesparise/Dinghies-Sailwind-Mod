@@ -1,8 +1,8 @@
 {
   "mod": "pr0skynesis.dinghies",
-  "latestVersion": "1.0.8",
+  "latestVersion": "1.0.9",
   "header": "Dinghies Mod",
-  "message": "Version 1.0.8 is out! Changelog:\n- Fixed saved names not loading\ncorrectly\n- Increased cart dude range by 50%",
+  "message": "Version 1.0.9 is out! Changelog:\n- Increased Cutter stability\n- Fixed damage water missing audio\n- Fixed damage water clipping out\nof the boat\n- Reduced davits prices",
   "charSize": 0.8,
   "messageVersion": "dinghies.3"
 }

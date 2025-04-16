@@ -43,7 +43,7 @@ namespace Dinghies
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.8";    //1.0.8 was the Namplate save fix and cart dude range increase
+        public const string pluginVersion = "1.0.9";    //1.0.9 was the damage water fix, increased stability and lower price for davits
         public const string shortName = "pr0.dinghies";
         
         //config file info
