@@ -1,5 +1,5 @@
 **Changes:**  
-• Fixed nameplates not loading the name properly;  
-• Increased range of all Cart Dudes by 50%;  
-
-
+• Increased Cutter stability;  
+• Fixed missing audio in damage water;  
+• Fixed damage water clipping out of the boat;    
+• Reduced davits prices;  
