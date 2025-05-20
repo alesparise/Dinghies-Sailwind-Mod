@@ -44,10 +44,6 @@ namespace Dinghies
                 {
                     saveContainer = UpdateSave(saveContainer);
                 }
-                //using (FileStream fileStream = File.Open(path, FileMode.Create))
-                //{   //pack the savecontainer back into the save
-                //    binaryFormatter.Serialize(fileStream, saveContainer);
-                //}
             }
             using (FileStream fileStream = File.Open(path, FileMode.Create))
             {   //pack the savecontainer back into the save

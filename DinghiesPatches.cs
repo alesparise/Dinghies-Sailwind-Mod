@@ -8,8 +8,6 @@ using UnityEngine;
 
 using Object = UnityEngine.Object;
 using System.Linq;
-using HarmonyLib;
-using DinghiesScripts;
 
 namespace Dinghies
 {

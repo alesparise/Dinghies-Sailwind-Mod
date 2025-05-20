@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Jobs;
+using UnityEngine;
 
 namespace Dinghies
 {   /// <summary>
@@ -96,26 +97,43 @@ namespace Dinghies
 
             if ((bool)stickyClickedBy || isClicked)
             {   //when it's clicked we control it with the A and D keys
-                if (stickyClickedBy.AltButtonDown())
+                int invert = DinghiesMain.invertedTillerConfig.Value ? -1 : 1;
+                if ((bool)stickyClickedBy)
                 {
-                    ToggleLock();
+                    if (stickyClickedBy.AltButtonDown())
+                    {
+                        ToggleLock();
+                    }
+                    if (!locked)
+                    {
+                        if (!held)
+                        {   // increases 5 times damper and spring values so the tiller is more stable
+                            held = true;
+                            ChangeDamper(held);
+                        }
+                        //int invert = DinghiesMain.invertedTillerConfig.Value ? -1 : 1;
+                        input += stickyClickedBy.movement.GetKeyboardDelta().x * mult * invert;
+                        if (stickyClickedBy.movement.GetKeyboardDelta().y != 0)
+                        {   //this should detect pressing forward or backward buttons
+                            input = 0;
+                        }
+                    }
+                    ApplyRotationLimit();
+                    RotateRudder();
                 }
-                if (!locked)
+                else if (isClicked && Settings.steeringWithMouse)
                 {
-                    if (!held)
-                    {   // increases 5 times damper and spring values so the tiller is more stable
-                        held = true;
-                        ChangeDamper(held);
+                    if (isClickedBy.pointer.AltButtonDown())
+                    {
+                        ToggleLock();
                     }
-                    int invert = DinghiesMain.invertedTillerConfig.Value ? -1 : 1;
-                    input += stickyClickedBy.movement.GetKeyboardDelta().x * mult * invert;
-                    if (stickyClickedBy.movement.GetKeyboardDelta().y != 0)
-                    {   //this should detect pressing forward or backward buttons
-                        input = 0;
+                    if (!locked)
+                    {
+                        input += isClickedBy.GetDeltaRotation().z * mult * 2 * invert;
                     }
+                    ApplyRotationLimit();
+                    RotateRudder();
                 }
-                ApplyRotationLimit();
-                RotateRudder();
             }
             else if (locked)
             {   //keep applying the rotation if it's locked. Also the input does not get set to 0 if it's locked

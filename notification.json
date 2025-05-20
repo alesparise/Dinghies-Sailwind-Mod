@@ -1,8 +1,8 @@
 {
   "mod": "pr0skynesis.dinghies",
-  "latestVersion": "1.0.9",
+  "latestVersion": "1.0.10",
   "header": "Dinghies Mod",
-  "message": "Version 1.0.9 is out! Changelog:\n- Increased Cutter stability\n- Fixed damage water missing audio\n- Fixed damage water clipping out\nof the boat\n- Reduced davits prices",
-  "charSize": 0.8,
+  "message": "Version 1.0.10 is out! Changelog:\n- Added a missing winch to the tall mast\n- Fixed oars becoming unresponsive in\ncertain conditions\n- Made it impossible to row when not standing\nin the boat\n- Made tiller compatible with the 'Steer\nwith mouse' option\n- Added a missing script on the packed\ntarp object (possible crashfix)",
+  "charSize": 0.65,
   "messageVersion": "dinghies.4"
 }

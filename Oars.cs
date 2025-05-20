@@ -22,6 +22,7 @@ namespace Dinghies
 
         private Rigidbody rb;
 
+        private Transform boatTrasform;
         private Transform forcePoint;
 
         public Rudder rudder;
@@ -50,7 +51,7 @@ namespace Dinghies
             }
             rb = transform.parent.parent.parent.parent.GetComponent<Rigidbody>();
             rudder = rb.transform.Find("cutterModel").Find("rudder").GetComponent<Rudder>();
-            //tiller = rudder.transform.GetChild(0).GetComponent<TillerRudder>();
+            boatTrasform = rb.transform;
         }
         public override void OnActivate(GoPointer activatingPointer)
         {
@@ -80,8 +81,8 @@ namespace Dinghies
                 firstTime = true;
                 return;
             }
-            if (locks.oarUp)
-            {   //if the oars are up we cannot move them
+            if (locks.oarUp || GameState.currentBoat != boatTrasform)
+            {   //if the oars are up we cannot move them, if we are not in the boat we cannot row
                 return;
             }
             if ((bool)stickyClickedBy || isClicked)
@@ -200,7 +201,8 @@ namespace Dinghies
         }
         private static float GetBoatHeeling()
         {   //returns boat heeling in degrees
-            Transform currentShip = GameState.currentBoat;
+            Transform currentShip = GameState.currentBoat ?? GameState.lastOwnedBoat;
+            if (currentShip == null) return 0f;
             Vector3 boatUp = currentShip.transform.up;
 
             return Vector3.SignedAngle(boatUp, Vector3.up, -Vector3.forward);

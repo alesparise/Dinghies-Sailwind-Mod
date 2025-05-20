@@ -1,7 +1,5 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
@@ -9,26 +7,12 @@ using UnityEngine;
 
 namespace Dinghies
 {   /// <summary>
-    /// Patchnotes (v.1.0.6)
-    /// • Added stowing mechanic:
-    ///     - Davits are available in the shipyard for the Sanbuq, Junk, Brig and Jong;
-    ///     - Davits come with a tarp cover package. Grab it and clip it with the dinghy to cover it;
-    ///     - Grab one of the hooks from the davits and click on the metal bits sticking out from the covered dinghy;
-    ///     - When both hooks are connected, raise the dinghy with the winches that come with the davits;
-    /// • Changed default rig when Shipyard Expansion is installed
-    /// • Slightly increased rudder power
-    /// • Added notification system:
-    ///     - Opening the game will show a notification message if there is a new one;
-    ///     - This can be disabled in the config file;
-    ///     - Messages will let you know about new updates or bugfixes;
-    /// • Made asset loader find assets relative to the .dll;
-    /// • Added bridge and scripts assemblies;
-    /// • Added a default name to the nameplate so that it's easier to find;
-    /// • Changed namplate saving and loading to allow multiple boats having names (future proofing, might erase your old name)
-    /// • Added check for the boat being bought before allowing the oars to be used
-    /// • Added a pillow option that acts like a bed, requires the long seat to be installed
-    /// • Added a centered tiller option, requires the mizzen mast to not be installed
-    /// • Merged the two flags option into one and added check for the correct shrouds to the flag options
+    /// Patchnotes (v.1.0.10)
+    /// • Added a missing winch to the tall mast
+    /// • Fixed oars becoming unresponsive in certain conditions
+    /// • Made it impossible to row when not standing in the boat
+    /// • Made tiller compatible with the "Steer with mouse" option
+    /// • Added a missing script on the packed tarp object (possible crashfix)
     /// 
     /// TODO: (later)
     /// • Experiment with automatic updates?
@@ -43,7 +27,7 @@ namespace Dinghies
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.9";    //1.0.9 was the damage water fix, increased stability and lower price for davits
+        public const string pluginVersion = "1.0.9";    //1.0.10 is the wip version
         public const string shortName = "pr0.dinghies";
         
         //config file info
