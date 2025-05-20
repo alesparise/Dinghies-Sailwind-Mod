@@ -34,7 +34,7 @@
  • **NANDFixes** is recommended to reduce the issues of inevitably having multiple boats close to eachother!  
 **Installation:** Download the Dinghies.zip and extract it into the *...\Sailwind\BepInEx\plugins* folder.  
 **Game version:** *0.29+*  
-**Mod Version:** *1.0.9*  
+**Mod Version:** *1.0.10*  
 **Warning:** Making a **backup of your save** is advisable before installing this mod!!!  
 
 **STOWING GUIDE:**  
