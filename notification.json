@@ -4,5 +4,5 @@
   "header": "Dinghies Mod",
   "message": "Version 1.0.10 is out! Changelog:\n- Added a missing winch to the tall mast\n- Fixed oars becoming unresponsive in\ncertain conditions\n- Made it impossible to row when not standing\nin the boat\n- Made tiller compatible with the 'Steer\nwith mouse' option\n- Added a missing script on the packed\ntarp object (possible crashfix)",
   "charSize": 0.65,
-  "messageVersion": "dinghies.4"
+  "messageVersion": "dinghies.5"
 }
