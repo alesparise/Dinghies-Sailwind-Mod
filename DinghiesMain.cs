@@ -27,7 +27,7 @@ namespace Dinghies
         // Necessary plugin info
         public const string pluginGuid = "pr0skynesis.dinghies";
         public const string pluginName = "Dinghies";
-        public const string pluginVersion = "1.0.10";    //1.0.10 was the missing winch, oars fix, added missing ShiftingRigidbody to tarp patch
+        public const string pluginVersion = "1.0.11";    //1.0.11 was fixing the oars not working anymore
         public const string shortName = "pr0.dinghies";
         
         //config file info

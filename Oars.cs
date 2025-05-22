@@ -23,6 +23,7 @@ namespace Dinghies
         private Rigidbody rb;
 
         private Transform boatTrasform;
+        private Transform boatModel;
         private Transform forcePoint;
 
         public Rudder rudder;
@@ -50,12 +51,15 @@ namespace Dinghies
                 forcePoint = transform.parent.parent.GetChild(3);
             }
             rb = transform.parent.parent.parent.parent.GetComponent<Rigidbody>();
-            rudder = rb.transform.Find("cutterModel").Find("rudder").GetComponent<Rudder>();
             boatTrasform = rb.transform;
+            boatModel = rb.transform.Find("cutterModel");
+            rudder = boatModel.Find("rudder").GetComponent<Rudder>();
         }
         public override void OnActivate(GoPointer activatingPointer)
         {
-            if (Settings.steeringWithMouse && activatingPointer.type == GoPointer.PointerType.crosshairMouse)
+            StickyClick(activatingPointer);
+
+            /*if (Settings.steeringWithMouse && activatingPointer.type == GoPointer.PointerType.crosshairMouse)
             {
                 MouseLook.ToggleMouseLook(newState: false);
             }
@@ -63,15 +67,15 @@ namespace Dinghies
             if (!Settings.steeringWithMouse && activatingPointer.type == GoPointer.PointerType.crosshairMouse)
             {
                 StickyClick(activatingPointer);
-            }
+            }*/
         }
-        public override void OnUnactivate(GoPointer activatingPointer)
+        /*public override void OnUnactivate(GoPointer activatingPointer)
         {
-            if (Settings.steeringWithMouse && activatingPointer.type == GoPointer.PointerType.crosshairMouse)
+            /*if (Settings.steeringWithMouse && activatingPointer.type == GoPointer.PointerType.crosshairMouse)
             {
                 MouseLook.ToggleMouseLook(newState: true);
             }
-        }
+        }*/
         public override void ExtraLateUpdate()
         {
             if (!firstTime)
@@ -81,7 +85,7 @@ namespace Dinghies
                 firstTime = true;
                 return;
             }
-            if (locks.oarUp || GameState.currentBoat != boatTrasform)
+            if (locks.oarUp || GameState.currentBoat != boatModel)
             {   //if the oars are up we cannot move them, if we are not in the boat we cannot row
                 return;
             }
